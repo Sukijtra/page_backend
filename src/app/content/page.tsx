@@ -7,11 +7,15 @@ import {
   ShoppingCart, 
   FileText, 
   Users, 
+  FilePen,
   Star, 
+  PackageCheck,
   Settings, 
   LogOut, 
+  DollarSign,
   Plus, 
   Edit3, 
+  Layers,
   Trash2, 
   Image as ImageIcon,
   Save,
@@ -19,6 +23,7 @@ import {
   Info,
   Facebook,
   Instagram,
+  ArrowUpRight,
   Phone,
   MapPin,
   Globe,
@@ -27,6 +32,8 @@ import {
 } from 'lucide-react';
 import { Sidebar } from '../../../components/sidebar';
 
+type ArticleCategory = 'knowledge' | 'promotion' | 'draft';
+
 // --- Types ---
 type Article = {
   id: number;
@@ -34,7 +41,7 @@ type Article = {
   excerpt: string;
   image: string;
   date: string;
-  category: 'knowledge' | 'promotion';
+  category: ArticleCategory;
 };
 
 type ShopInfo = {
@@ -84,6 +91,22 @@ const initialArticles: Article[] = [
     category: 'promotion'
   }
 ];
+
+const StatCard = ({ title, value, growth, trend, icon: Icon, colorClass }: any) => (
+  <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+    <div className="flex justify-between items-start mb-4">
+      <div>
+        <h3 className="text-gray-500 text-sm font-medium mb-1">{title}</h3>
+        <div className="text-xl font-bold text-gray-800">{value}</div>
+      </div>
+      <div className={`p-2 rounded-lg ${colorClass}`}>
+        <Icon className="w-5 h-5" />
+      </div>
+    </div>
+    <div className="flex items-center gap-2">
+    </div>
+  </div>
+);
 
 const initialShopInfo: ShopInfo = {
   name: "ร้านเพชรพลอย จิวเวลรี่",
@@ -137,10 +160,12 @@ const TabButton = ({ active, onClick, icon: Icon, label }: any) => (
     </button>
   );
 
+
+
 // --- Content Page Component ---
 
 const ContentManagement = () => {
-  const [activeTab, setActiveTab] = useState<'knowledge' | 'promotion' | 'about'>('knowledge');
+  const [activeTab, setActiveTab] = useState<ArticleCategory | 'about'>('knowledge');
   const [articles, setArticles] = useState<Article[]>(initialArticles);
   const [shopInfo, setShopInfo] = useState<ShopInfo>(initialShopInfo);
   
@@ -182,7 +207,7 @@ const ContentManagement = () => {
         id: newId, 
         ...formData, 
         date: new Date().toISOString().split('T')[0],
-        category: activeTab as 'knowledge' | 'promotion'
+        category: activeTab as ArticleCategory
       }]);
     }
     setIsModalOpen(false);
@@ -211,13 +236,18 @@ const ContentManagement = () => {
                 className="bg-gray-900 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 text-sm font-medium hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200"
             >
                 <Plus className="w-4 h-4" />
-                {activeTab === 'knowledge' ? 'เพิ่มบทความ' : 'เพิ่มโปรโมชั่น'}
+                {activeTab === 'knowledge'
+                  ? 'เพิ่มบทความ'
+                  : activeTab === 'promotion'
+                  ? 'เพิ่มโปรโมชั่น'
+                  : 'เพิ่มฉบับร่าง'}
+
             </button>
         )}
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-t-xl border-b border-gray-200 px-2 flex flex-wrap">
+      <div className="bg-white rounded-t-xl border-b border-gray-200 px-2 flex">
         <TabButton 
           active={activeTab === 'knowledge'} 
           onClick={() => setActiveTab('knowledge')} 
@@ -225,24 +255,24 @@ const ContentManagement = () => {
           label="ความรู้เรื่องเพชร" 
         />
         <TabButton 
-          active={activeTab === 'promotion'} 
-          onClick={() => setActiveTab('promotion')} 
-          icon={Megaphone} 
-          label="โปรโมชั่น" 
-        />
-        <TabButton 
-          active={activeTab === 'about'} 
-          onClick={() => setActiveTab('about')} 
-          icon={Info} 
-          label="เกี่ยวกับเรา (About Us)" 
-        />
+        active={activeTab === 'draft'} 
+        onClick={() => setActiveTab('draft')} 
+        icon={FilePen} 
+        label="ฉบับร่าง" 
+      />
+
+
+
+
+      
       </div>
+      <div className="bg-white rounded-t-xl border-b border-gray-200 px-2 flex flex-wrap"></div>
 
       {/* Content Area */}
       <div className="bg-white rounded-b-xl rounded-tr-xl shadow-sm border border-gray-200 min-h-[500px] p-6">
         
         {/* --- Tab: Knowledge & Promotion (Shared Grid Layout) --- */}
-        {(activeTab === 'knowledge' || activeTab === 'promotion') && (
+        {(activeTab === 'knowledge' || activeTab === 'promotion' || activeTab === 'draft') && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredArticles.length > 0 ? (
                     filteredArticles.map((article) => (
@@ -472,6 +502,8 @@ const ContentManagement = () => {
 
     </div>
   );
+
+  
 };
 
 export default function App() {

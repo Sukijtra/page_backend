@@ -40,6 +40,7 @@ type BankAccount = {
   color: string; // For UI styling
 };
 
+
 // --- Mock Data ---
 const initialStoreData = {
   name: "ร้านเพชรพลอย จิวเวลรี่",
@@ -102,6 +103,14 @@ const Modal = ({ isOpen, onClose, title, children, footer }: any) => {
 const StoreSettings = () => {
   const [storeData, setStoreData] = useState(initialStoreData);
   const [bankAccounts, setBankAccounts] = useState(initialBankAccounts);
+
+  // Bank Selection State (เลือกได้ 1 ธนาคาร)
+const [selectedBankId, setSelectedBankId] = useState<number | null>(null);
+
+// ธนาคารที่ถูกเลือก (เอาไปใช้งานต่อได้)
+const selectedBank = bankAccounts.find(
+  (bank) => bank.id === selectedBankId
+);
   
   // Bank Modal State
   const [isBankModalOpen, setIsBankModalOpen] = useState(false);
@@ -333,40 +342,98 @@ const StoreSettings = () => {
                 </div>
                 
                 <div className="p-4 space-y-4">
-                    {bankAccounts.map((account) => (
-                        <div key={account.id} className="group relative overflow-hidden rounded-xl border border-gray-200 shadow-sm transition-all hover:shadow-md">
-                            {/* Card Background Decoration */}
-                            <div className={`absolute top-0 left-0 w-2 h-full ${account.color}`}></div>
+                    {bankAccounts.map((account) => {const isSelected = selectedBankId === account.id;
+                      return (
+                        <div
+                          key={account.id}
+                          onClick={() => setSelectedBankId(account.id)}
+                          className={`group relative overflow-hidden rounded-xl border cursor-pointer
+                            transition-all
+                            ${isSelected
+                              ? 'border-gray-900 ring-2 ring-gray-900/20 shadow-md'
+                              : 'border-gray-200 shadow-sm hover:shadow-md'
+                            }`}
                             
-                            <div className="p-4 pl-6">
-                                <div className="flex justify-between items-start mb-2">
-                                    <div className="flex items-center gap-2">
-                                        <Building2 className={`w-4 h-4 ${account.color.replace('bg-', 'text-')}`} />
-                                        <h4 className="font-semibold text-gray-900 text-sm">{account.bankName}</h4>
-                                    </div>
-                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={() => handleOpenEditBank(account)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded">
-                                            <Edit3 className="w-3.5 h-3.5" />
-                                        </button>
-                                        <button onClick={() => handleDeleteBank(account.id)} className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded">
-                                            <Trash2 className="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
-                                </div>
-                                <p className="font-mono text-lg text-gray-800 tracking-wider mb-1">{account.accountNumber}</p>
-                                <p className="text-xs text-gray-500">{account.accountName}</p>
-                                
-                                {account.qrCode && (
-                                    <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
-                                        <QrCode className="w-3 h-3 text-gray-400" />
-                                        <span className="text-xs text-green-600 font-medium flex items-center gap-1">
-                                            <CheckCircle className="w-3 h-3" /> มี QR Code แล้ว
-                                        </span>
-                                    </div>
-                                )}
+                        >
+                          {/* Card Background Decoration */}
+                          <div className={`absolute top-0 left-0 w-2 h-full ${account.color}`}></div>
+                          
+
+                          {/* ไอคอนเลือกแล้ว */}
+                          {isSelected && (
+                            <div className="absolute top-3 right-3 bg-gray-900 text-white rounded-full p-1">
+                              <CheckCircle className="w-4 h-4" />
                             </div>
+                          )}
+                          
+
+                          <div className="p-4 pl-6">
+                            <div className="flex justify-between items-start mb-2">
+                              <div className="flex items-center gap-3">
+                                {/* Radio */}
+                                <div
+                                  className={`w-4 h-4 rounded-full border-2 flex items-center justify-center
+                                    ${isSelected ? 'border-gray-900' : 'border-gray-300'}`}
+                                >
+                                  {isSelected && (
+                                    <div className="w-2 h-2 bg-gray-900 rounded-full"></div>
+                                  )}
+                                </div>
+
+                                <Building2
+                                  className={`w-4 h-4 ${account.color.replace('bg-', 'text-')}`}
+                                />
+                                <h4 className="font-semibold text-gray-900 text-sm">
+                                  {account.bankName}
+                                </h4>
+                              </div>
+
+                              {/* ปุ่มแก้ไข / ลบ (ไม่ให้ไป trigger การเลือก) */}
+                              <div
+                                className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <button
+                                  onClick={() => handleOpenEditBank(account)}
+                                  className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteBank(account.id)}
+                                  className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+
+                            <p className="font-mono text-lg text-gray-800 tracking-wider mb-1">
+                              {account.accountNumber}
+                            </p>
+                            <p className="text-xs text-gray-500">{account.accountName}</p>
+
+                            {account.qrCode && (
+                              <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
+                                <QrCode className="w-3 h-3 text-gray-400" />
+                                <span className="text-xs text-green-600 font-medium flex items-center gap-1">
+                                  <CheckCircle className="w-3 h-3" /> มี QR Code แล้ว
+                                </span>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                    ))}
+                      );
+                    })}
+                    {/* 🔽 ตรงนี้แหละ ที่ถามหา */}
+                    {selectedBank && (
+                      <div className="mt-4 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                        เลือกบัญชี:
+                        <span className="font-semibold text-gray-900 ml-1">
+                          {selectedBank.bankName}
+                        </span>
+                      </div>
+                    )}
 
                     {bankAccounts.length === 0 && (
                         <div className="text-center py-8 text-gray-400 border-2 border-dashed border-gray-100 rounded-xl">
@@ -443,12 +510,14 @@ const StoreSettings = () => {
                     </label>
                 </div>
             </div>
+            
         </div>
       </Modal>
 
     </div>
   );
 };
+
 
 export default function App() {
   return (

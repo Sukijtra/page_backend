@@ -9,6 +9,8 @@ import {
   Users, 
   Star, 
   Settings, 
+  Layers,
+  DollarSign,
   LogOut, 
   Plus, 
   Search, 
@@ -16,10 +18,12 @@ import {
   MoreHorizontal, 
   Edit3, 
   Trash2, 
+  PackageCheck,
   Check, 
   X, 
+  Eye, 
   ChevronDown,
-  Layers,
+  Boxes,
   Shapes,
   Image as ImageIcon
 } from 'lucide-react';
@@ -64,17 +68,50 @@ const initialMaterials: Material[] = [
   { id: 4, name: "แพลตตินัม (Platinum)", status: true },
 ];
 
+// --- Main Content Component ---
+
+const ProductManagement = () => {
+  const [activeTab, setActiveTab] = useState<'products' | 'categories' | 'materials'>('products');
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [materials, setMaterials] = useState<Material[]>(initialMaterials);
+
+    const toggleCategoryStatus = (id: number) => {
+    setCategories(prev =>
+      prev.map(cat =>
+        cat.id === id ? { ...cat, status: !cat.status } : cat
+      )
+    );
+  };
 // --- Components ---
 
+const StatCard = ({ title, value, growth, trend, icon: Icon, colorClass }: any) => (
+  <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+    <div className="flex justify-between items-start mb-4">
+      <div>
+        <h3 className="text-gray-500 text-sm font-medium mb-1">{title}</h3>
+        <div className="text-xl font-bold text-gray-800">{value}</div>
+      </div>
+      <div className={`p-2 rounded-lg ${colorClass}`}>
+        <Icon className="w-5 h-5" />
+      </div>
+    </div>
+    <div className="flex items-center gap-2">
+    </div>
+  </div>
+);
 // --- Sub-Components for Product Page ---
-
-const StatusBadge = ({ status }: { status: boolean }) => (
-  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border
-    ${status 
-      ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
-      : 'bg-gray-100 text-gray-600 border-gray-200'}`}>
-    {status ? 'เปิดขาย' : 'ปิดการขาย'}
-  </span>
+const StatusSwitch = ({ status, onToggle }: { status: boolean; onToggle: () => void }) => (
+  <button
+    onClick={onToggle}
+    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
+      ${status ? 'bg-emerald-500' : 'bg-gray-300'}`}
+  >
+    <span
+      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
+        ${status ? 'translate-x-6' : 'translate-x-1'}`}
+    />
+  </button>
 );
 
 const TabButton = ({ active, onClick, icon: Icon, label }: any) => (
@@ -90,13 +127,6 @@ const TabButton = ({ active, onClick, icon: Icon, label }: any) => (
   </button>
 );
 
-// --- Main Content Component ---
-
-const ProductManagement = () => {
-  const [activeTab, setActiveTab] = useState<'products' | 'categories' | 'materials'>('products');
-  const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
-  const [materials, setMaterials] = useState<Material[]>(initialMaterials);
 
   // Handlers (Mock logic)
   const toggleProductStatus = (id: number) => {
@@ -143,6 +173,41 @@ const ProductManagement = () => {
           onClick={() => setActiveTab('materials')} 
           icon={Shapes} 
           label="วัสดุตัวเรือน" 
+        />
+      </div>
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+        <StatCard 
+          title="สิ้นค้าทั้งหมด (ชิ้น)" 
+          value="3" 
+          //growth="+20%" 
+          //trend="up" 
+          icon={Layers}
+          colorClass="bg-blue-50 text-blue-600"
+        />
+        <StatCard 
+          title="วัสดุทองคำขาวทั้งหมด (ชิ้น)" 
+          value="50" 
+          growth="+15%" 
+          trend="up" 
+          icon={PackageCheck}
+          colorClass="bg-emerald-50 text-emerald-600"
+        />
+        <StatCard 
+          title="วัสดุทองคำทั้งหมด (ชิ้น)" 
+          value="85" 
+          growth="+15%" 
+          trend="up" 
+          icon={PackageCheck}
+          colorClass="bg-emerald-50 text-emerald-600"
+          />
+        <StatCard 
+          title="วัสดุทองชมพูทั้งหมด (ชิ้น)" 
+          value="55" 
+          growth="+15%" 
+          trend="up" 
+          icon={PackageCheck}
+          colorClass="bg-emerald-50 text-emerald-600"
         />
       </div>
 
@@ -216,18 +281,18 @@ const ProductManagement = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <StatusBadge status={product.status} />
+                        <StatusSwitch
+                          status={product.status}
+                          onToggle={() => toggleProductStatus(product.id)}
+                        />
                       </td>
+
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button 
-                            onClick={() => toggleProductStatus(product.id)}
-                            className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg" title="เปลี่ยนสถานะ">
-                            {product.status ? <X className="w-4 h-4" /> : <Check className="w-4 h-4" />}
-                          </button>
                           <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg" title="แก้ไข">
                             <Edit3 className="w-4 h-4" />
                           </button>
+                          
                           <button 
                             onClick={() => deleteProduct(product.id)}
                             className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg" title="ลบ">
@@ -275,7 +340,11 @@ const ProductManagement = () => {
                       <span className="text-sm font-medium text-gray-700">{cat.name}</span>
                     </div>
                     <div className="flex items-center gap-2 opacity-50 group-hover:opacity-100">
-                      <StatusBadge status={cat.status} />
+                      <StatusSwitch
+                      status={cat.status}
+                      onToggle={() => toggleCategoryStatus(cat.id)}
+/>
+
                       <button className="p-1.5 hover:bg-gray-200 rounded text-gray-500"><Edit3 className="w-3 h-3" /></button>
                     </div>
                   </div>

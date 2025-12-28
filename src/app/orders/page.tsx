@@ -6,13 +6,19 @@ import {
   Gem, 
   ShoppingCart, 
   FileText, 
+  Layers,
   Users, 
   Star, 
   Settings, 
   LogOut, 
+  PackageCheck,
+  DollarSign,
   Search, 
   Filter, 
   Eye, 
+  Plus, 
+  Trash2, 
+  Edit3, 
   MoreHorizontal, 
   Calendar, 
   Package, 
@@ -146,6 +152,22 @@ const mockOrders: Order[] = [
   },
 ];
 
+const StatCard = ({ title, value, growth, trend, icon: Icon, colorClass }: any) => (
+  <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+    <div className="flex justify-between items-start mb-4">
+      <div>
+        <h3 className="text-gray-500 text-sm font-medium mb-1">{title}</h3>
+        <div className="text-xl font-bold text-gray-800">{value}</div>
+      </div>
+      <div className={`p-2 rounded-lg ${colorClass}`}>
+        <Icon className="w-5 h-5" />
+      </div>
+    </div>
+    <div className="flex items-center gap-2">
+    </div>
+  </div>
+);
+
 // --- Config ---
 const statusConfig: Record<OrderStatus, { label: string; color: string; icon: any }> = {
   pending_payment: { label: "รอชำระเงิน", color: "bg-orange-50 text-orange-700 border-orange-200", icon: Clock },
@@ -254,6 +276,43 @@ const OrderManagement = () => {
         </div>
       </div>
 
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+        <StatCard 
+          title="ลูกค้าทั้งหมด (คน)" 
+          value="3" 
+          //growth="+20%" 
+          //trend="up" 
+          icon={Layers}
+          colorClass="bg-blue-50 text-blue-600"
+        />
+        <StatCard 
+          title="ยอดคำสั่งซื้อทั้งหมด (ชิ้น)" 
+          value="฿2,850" 
+          growth="+15%" 
+          trend="up" 
+          icon={Box}
+          colorClass="bg-indigo-50 text-indigo-600"
+        />
+        <StatCard 
+          title="รายได้ทั้งหมด (บาท)" 
+          value="฿1,850,000" 
+          growth="+15%" 
+          trend="up" 
+          icon={DollarSign}
+          colorClass="bg-indigo-50 text-indigo-600"
+        />
+        <StatCard 
+          title="จัดส่งแล้วทั้งหมด (ชิ้น)" 
+          value="฿1,850,000" 
+          growth="+15%" 
+          trend="up" 
+          icon={PackageCheck}
+          colorClass="bg-indigo-50 text-indigo-600"
+        />
+      </div>
+
+
       {/* Toolbar */}
       <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
         {/* Search & Filter */}
@@ -358,11 +417,25 @@ const OrderManagement = () => {
                         ฿{order.total.toLocaleString()}
                     </td>
                     <td className="px-6 py-4">
-                        <div className="flex justify-center">
-                            <button className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all">
-                                <Eye className="w-4 h-4" />
-                            </button>
+                        <div className="flex items-center gap-2">
+                          <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg">
+                            <Eye className="w-4 h-4" />
+                          </button>
+
+                          <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg">
+                            <Plus className="w-4 h-4" />
+                          </button>
+
+
+                          <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+                            <Edit3 className="w-4 h-4" />
+                          </button>
+
+                          <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
                         </div>
+
                     </td>
                     </tr>
                 );

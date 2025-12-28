@@ -1,5 +1,10 @@
 'use client'
 import React from 'react';
+import { DollarSign } from "lucide-react";
+import { PackageCheck } from "lucide-react";
+import { TrendingUp } from "lucide-react";
+import { Layers } from "lucide-react";
+
 import { 
   LayoutDashboard, 
   Gem, 
@@ -17,6 +22,8 @@ import {
 import { 
   BarChart, 
   Bar, 
+  LineChart,
+  Line,
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -26,7 +33,23 @@ import {
   Pie, 
   Cell
 } from 'recharts';
+
 import { Sidebar } from '../../components/sidebar';
+
+
+// --- Types (Adapted from your ProductManagement.tsx) ---
+type Product = {
+  id: number;
+  name: string;
+  category: string;
+  material: string;
+  karat: string;
+  price: number;
+  stock: number;
+  status: boolean;
+  image: string;
+};
+
 
 // --- Types & Interfaces ---
 // ใน Next.js จริง ส่วนนี้อาจจะแยกเป็น file types.ts
@@ -35,6 +58,16 @@ interface MenuItem {
   icon: any;
   href: string;
 }
+
+const trendTableData = [
+  { month: 'ม.ค.', sales: 400000, orders: 32 },
+  { month: 'ก.พ.', sales: 300000, orders: 28 },
+  { month: 'มี.ค.', sales: 500000, orders: 40 },
+  { month: 'เม.ย.', sales: 450000, orders: 36 },
+  { month: 'พ.ค.', sales: 700000, orders: 55 },
+  { month: 'มิ.ย.', sales: 650000, orders: 48 },
+];
+
 
 // --- Mock Data ---
 const salesData = [
@@ -76,7 +109,7 @@ const StatCard = ({ title, value, growth, trend, icon: Icon, colorClass }: any) 
     <div className="flex justify-between items-start mb-4">
       <div>
         <h3 className="text-gray-500 text-sm font-medium mb-1">{title}</h3>
-        <div className="text-3xl font-bold text-gray-800">{value}</div>
+        <div className="text-xl font-bold text-gray-800">{value}</div>
       </div>
       <div className={`p-2 rounded-lg ${colorClass}`}>
         <Icon className="w-5 h-5" />
@@ -118,9 +151,9 @@ const DashboardContent = () => {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
         <StatCard 
-          title="คำสั่งซื้อทั้งหมด" 
+          title="คำสั่งซื้อทั้งหมด (ชิ้น)" 
           value="245" 
           growth="+20%" 
           trend="up" 
@@ -128,19 +161,28 @@ const DashboardContent = () => {
           colorClass="bg-blue-50 text-blue-600"
         />
         <StatCard 
-          title="รายได้รวม" 
+          title="รายได้รวม (บาท)" 
           value="฿2,850,000" 
           growth="+15%" 
           trend="up" 
-          icon={BarChart} 
+          icon={DollarSign}
           colorClass="bg-indigo-50 text-indigo-600"
         />
         <StatCard 
-          title="ลูกค้าใหม่" 
+          title="คำสั่งซื้อวันนี้ (ชิ้น)" 
           value="48" 
           growth="+8%" 
           trend="up" 
-          icon={Users}
+          icon={ShoppingCart}
+          colorClass="bg-emerald-50 text-emerald-600"
+        />
+
+        <StatCard 
+          title="จัดส่งทั้งหมดแล้ว (ชิ้น)" 
+          value="1,220" 
+          growth="+10%" 
+          trend="up" 
+          icon={PackageCheck}
           colorClass="bg-emerald-50 text-emerald-600"
         />
       </div>
@@ -151,7 +193,7 @@ const DashboardContent = () => {
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-gray-100 rounded-md"><BarChart className="w-4 h-4 text-gray-600" /></div>
+                <div className="p-1.5 bg-gray-100 rounded-md"><TrendingUp className="w-4 h-4 text-gray-600" /></div>
                 <h3 className="font-semibold text-gray-800">ยอดขายรายเดือน</h3>
             </div>
             <div className="flex gap-1 bg-gray-50 p-1 rounded-lg">
@@ -181,7 +223,7 @@ const DashboardContent = () => {
         {/* Pie Chart Section */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
             <div className="flex items-center gap-2 mb-6">
-                <div className="p-1.5 bg-gray-100 rounded-md"><PieChart className="w-4 h-4 text-gray-600" /></div>
+                <div className="p-1.5 bg-gray-100 rounded-md"><Layers className="w-4 h-4 text-gray-600" /></div>
                 <h3 className="font-semibold text-gray-800">สัดส่วนสินค้าแต่ละหมวด</h3>
             </div>
           <div className="h-[220px] relative">
@@ -222,31 +264,88 @@ const DashboardContent = () => {
           </div>
         </div>
       </div>
-
+      
+       {/* Trend Table Section */}
+<div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+  <h3 className="font-semibold text-gray-800 mb-4"> ตารางแนวโน้มยอดขายรายเดือน</h3> 
+  {/* Line Chart */}
+  <div className="h-[350px] mb-4"> 
+    <ResponsiveContainer width="60%" height="60%">
+      <LineChart data={trendTableData}>
+        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+        <XAxis dataKey="month" />
+        <YAxis />
+        <Tooltip />
+        <Line
+          type="monotone"
+          dataKey="sales"
+          stroke="#111827"
+          strokeWidth={2.5}
+          dot={{ r: 4 }}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  </div>
+  
+</div>
+       
       {/* Top Products Section */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <div className="flex items-center gap-2 mb-6">
-             <div className="p-1.5 bg-orange-100 rounded-md"><Star className="w-4 h-4 text-orange-600" /></div>
-            <h3 className="font-semibold text-gray-800">สินค้าขายดี Top 5</h3>
+<div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+  <div className="flex items-center gap-2 mb-6">
+    <div className="p-1.5 bg-orange-100 rounded-md">
+      <Star className="w-4 h-4 text-orange-600" />
+    </div>
+    <h3 className="font-semibold text-gray-800">สินค้าขายดี Top 5</h3>
+    
+  <table className="w-full border-collapse">
+    <thead>
+      <tr>
+        <th className="px-5 py-4">สินค้า</th>
+        <th className="px-5 py-4">หมวดหมู่</th>
+        <th className="px-5 py-4">วัสดุ</th>
+      </tr>
+    </thead>
+
+
+    <tbody>
+      {/* map ข้อมูลตรงนี้ */}
+    </tbody>
+  </table>
+</div>
+
+  <div className="space-y-2 divide-gray-100">
+    {topProducts.map((product) => (
+      <div
+        key={product.rank}
+        className="flex items-center gap-4 bg-white border border-gray-100 rounded-xl px-4 py-3 hover:shadow-md transition-all"
+      >
+        {/* Rank */}
+        <div className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-900 text-white text-xs font-bold shrink-0">
+          {product.rank}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {topProducts.map((product) => (
-            <div key={product.rank} className="group relative bg-white border border-gray-100 rounded-xl p-4 hover:shadow-lg hover:border-gray-200 transition-all cursor-pointer">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-gray-900 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-white">
-                {product.rank}
-              </div>
-              <div className="mt-2 w-full h-24 bg-gray-50 rounded-lg flex items-center justify-center text-4xl mb-3 group-hover:scale-105 transition-transform">
-                {product.image}
-              </div>
-              <h4 className="font-medium text-gray-800 text-sm line-clamp-1 mb-1 text-center">{product.name}</h4>
-              <p className="text-xs text-gray-400 text-center mb-3">{product.category}</p>
-              <div className="flex justify-center">
-                 <span className="bg-gray-900 text-white text-xs px-2.5 py-1 rounded-full">{product.sold} ชิ้น</span>
-              </div>
-            </div>
-          ))}
+
+        {/* Image */}
+        <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center text-xl shrink-0">
+          {product.image}
         </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <h4 className="font-medium text-gray-800 text-sm truncate">
+            {product.name}
+          </h4>
+          <p className="text-xs text-gray-400">{product.category}</p>
+        </div>
+
+        {/* Sold */}
+        <span className="bg-gray-900 text-white text-xs px-3 py-1 rounded-full shrink-0">
+          {product.sold} ชิ้น
+        </span>
       </div>
+    ))}
+  </div>
+</div>
+
 
       {/* Alerts Section */}
       <div className="bg-orange-50/50 p-6 rounded-2xl border border-orange-100">
