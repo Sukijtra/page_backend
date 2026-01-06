@@ -168,12 +168,6 @@ const TabButton = ({ active, onClick, icon: Icon, label }: any) => (
           icon={Layers} 
           label="หมวดหมู่" 
         />
-        <TabButton 
-          active={activeTab === 'materials'} 
-          onClick={() => setActiveTab('materials')} 
-          icon={Shapes} 
-          label="วัสดุตัวเรือน" 
-        />
       </div>
       {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-5">

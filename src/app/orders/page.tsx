@@ -327,16 +327,6 @@ const OrderManagement = () => {
               className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 text-sm"
             />
           </div>
-          <div className="flex gap-3">
-             <button className="px-4 py-2.5 border border-gray-200 rounded-lg flex items-center gap-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
-               <Calendar className="w-4 h-4" />
-               วันที่
-             </button>
-             <button className="px-4 py-2.5 border border-gray-200 rounded-lg flex items-center gap-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
-               <Filter className="w-4 h-4" />
-               ตัวกรอง
-             </button>
-          </div>
         </div>
 
         {/* Custom Tabs */}
@@ -421,12 +411,7 @@ const OrderManagement = () => {
                           <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg">
                             <Eye className="w-4 h-4" />
                           </button>
-
-                          <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg">
-                            <Plus className="w-4 h-4" />
-                          </button>
-
-
+                          
                           <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
                             <Edit3 className="w-4 h-4" />
                           </button>
@@ -461,7 +446,6 @@ const OrderManagement = () => {
         title={`รายละเอียดคำสั่งซื้อ #${selectedOrder?.id}`}
         footer={
           <>
-            <button onClick={() => setIsDetailOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">ปิดหน้าต่าง</button>
             {selectedOrder?.status === 'pending_payment' && (
                 <button 
                     onClick={() => handleUpdateStatus('pending_production')}

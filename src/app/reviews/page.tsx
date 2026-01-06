@@ -196,24 +196,24 @@ const ReviewManagement = () => {
         </div>
         <div className="flex gap-4">
             <div className="bg-white/50 backdrop-blur-sm px-5 py-3 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-100 to-yellow-50 flex items-center justify-center text-yellow-600 shadow-inner">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center text-blue-600 shadow-inner">
                     <Star className="w-6 h-6 fill-current" />
                 </div>
                 <div>
                     <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">คะแนนเฉลี่ย</p>
                     <div className="flex items-baseline gap-1">
                         <p className="text-2xl font-bold text-gray-900">{averageRating}</p>
-                        <span className="text-sm text-gray-400">/ 5.0</span>
+                        <span className="text-sm text-gray-500">/ 5.0</span>
                     </div>
                 </div>
             </div>
             <div className="bg-white/50 backdrop-blur-sm px-5 py-3 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center text-blue-600 shadow-inner">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-50 flex items-center justify-center text-emerald-600 shadow-inner">
                     <MessageSquare className="w-6 h-6" />
                 </div>
                 <div>
                     <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">รีวิวทั้งหมด</p>
-                    <p className="text-2xl font-bold text-gray-900">{reviews.length} <span className="text-sm font-normal text-gray-400">รายการ</span></p>
+                    <p className="text-2xl font-bold text-gray-900">{reviews.length} <span className="text-sm font-normal text-gray-500">รายการ</span></p>
                 </div>
             </div>
         </div>

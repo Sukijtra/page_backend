@@ -261,9 +261,6 @@ const ContentManagement = () => {
         label="ฉบับร่าง" 
       />
 
-
-
-
       
       </div>
       <div className="bg-white rounded-t-xl border-b border-gray-200 px-2 flex flex-wrap"></div>

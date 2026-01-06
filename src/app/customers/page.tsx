@@ -196,10 +196,6 @@ const CustomerManagement = () => {
           <h2 className="text-2xl font-bold text-gray-900">จัดการลูกค้า</h2>
           <p className="text-gray-500 text-sm mt-1">รายชื่อและประวัติการซื้อขายของลูกค้าทั้งหมด</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg px-4 py-2 flex items-center gap-3 text-sm font-medium text-gray-600 shadow-sm">
-            <Users className="w-4 h-4 text-gray-400" />
-            <span>ลูกค้าทั้งหมด: {customers.length} คน</span>
-        </div>
       </div>
 
     {/* Stats Row */}
@@ -310,10 +306,6 @@ const CustomerManagement = () => {
                         onClick={() => setSelectedCustomer(customer)}
                         className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all" title="ดูรายละเอียด">
                         <Eye className="w-4 h-4" />
-                        </button>
-                        
-                        <button className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg" title="แก้ไข">
-                        <Plus className="w-4 h-4" />
                         </button>
 
                         <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg" title="แก้ไข">
