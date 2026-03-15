@@ -1,0 +1,646 @@
+/* --- Base Styles --- */
+.dashboard-container {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.animate-in {
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* --- Header Section --- */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.header-title h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.header-title p {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.bell-button {
+    position: relative;
+    padding: 8px;
+    color: #9ca3af;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.bell-button:hover {
+    color: #4b5563;
+}
+
+.notif-dot {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background-color: #ef4444;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+/* --- Stat Cards --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.stat-card {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    border: 1px solid #f3f4f6;
+    transition: box-shadow 0.3s;
+}
+
+.stat-card:hover {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.stat-info h3 {
+    font-size: 14px;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 30px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.stat-icon {
+    padding: 8px;
+    border-radius: 8px;
+}
+
+.stat-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.growth-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* --- Charts Row --- */
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+@media (min-width: 1024px) {
+    .charts-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .col-span-2 {
+        grid-column: span 2 / span 2;
+    }
+}
+
+.chart-card {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    border: 1px solid #f3f4f6;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+
+.chart-filters {
+    display: flex;
+    gap: 4px;
+    background: #f9fafb;
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.filter-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    background: transparent;
+    transition: all 0.2s;
+}
+
+.filter-btn.active {
+    background: white;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    color: #1f2937;
+    font-weight: 500;
+}
+
+/* --- Pie Chart Styling --- */
+.pie-container {
+    height: 220px;
+    position: relative;
+}
+
+.pie-center-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.pie-center-text .val { font-size: 24px; font-weight: 700; color: #1f2937; }
+.pie-center-text .lbl { font-size: 12px; color: #6b7280; }
+
+.legend-list {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.legend-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+}
+
+.legend-label { display: flex; align-items: center; gap: 8px; color: #4b5563; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* --- Top Products --- */
+.products-container {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid #f3f4f6;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+@media (min-width: 640px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 768px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1024px) { .products-grid { grid-template-columns: repeat(5, 1fr); } }
+
+.product-item {
+    position: relative;
+    background: white;
+    border: 1px solid #f3f4f6;
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.product-item:hover {
+    box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+    border-color: #e5e7eb;
+}
+
+.product-rank {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 24px;
+    background: #111827;
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+}
+
+.product-img {
+    margin-top: 8px;
+    height: 96px;
+    background: #f9fafb;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin-bottom: 12px;
+    transition: transform 0.2s;
+}
+
+.product-item:hover .product-img { transform: scale(1.05); }
+
+.product-title {
+    font-weight: 500;
+    color: #1f2937;
+    font-size: 14px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 0 4px 0;
+}
+
+.product-category { font-size: 12px; color: #9ca3af; text-align: center; margin-bottom: 12px; }
+
+.sold-badge {
+    background: #111827;
+    color: white;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    display: inline-block;
+}
+
+/* --- Alerts Section --- */
+.alerts-container {
+    background: #fffaf5; /* Orange-50/50 */
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid #ffedd5;
+}
+
+.alert-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #f3f4f6;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    margin-bottom: 12px;
+}
+
+.alert-content { display: flex; align-items: center; gap: 16px; }
+.alert-img-box {
+    width: 48px;
+    height: 48px;
+    background: #f9fafb;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    border: 1px solid #f3f4f6;
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: #ef4444;
+    border-radius: 50%;
+    animation: alert-pulse 2s infinite;
+}
+
+@keyframes alert-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.1); }
+}
+
+/* ===== Line / Area Charts ===== */
+
+.line-chart-wrapper {
+  width: 100%;
+  height: 280px;
+  margin-top: 12px;
+}
+
+.recharts-cartesian-grid-horizontal line {
+  stroke: #e5e7eb;
+}
+
+.recharts-tooltip-wrapper {
+  font-size: 12px;
+}
+
+.linechart-grid line {
+  stroke: #e5e7eb;
+}
+
+.linechart-line {
+  stroke: #111827;
+  stroke-width: 2.5;
+}
+
+
+.linechart-tooltip {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #111827;
+}
+
+/* ===== Mini Area Chart ===== */
+
+.mini-chart-wrapper {
+  width: 100%;
+  height: 220px; 
+  margin-top: 16px;
+}
+
+
+.mini-chart-tooltip {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 12px;
+  padding: 6px 10px;
+}
+
+.chart-title-box h3 {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.revenue-tooltip {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #111827;
+}
+
+/* กล่องไอคอน */
+.chart-icon-bg {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* สีพื้นหลัง ยอดขาย */
+.chart-icon-bg.emerald {
+  background-color: #ecfdf5; /* emerald-50 */
+}
+
+/* ไอคอน */
+.chart-icon {
+  width: 16px;
+  height: 16px;
+  color: #059669; 
+}
+
+/* กล่องหัวกราฟ */
+.chart-title-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* หัวข้อกราฟ */
+.chart-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.chart-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chart-icon-bg.blue {
+  background-color: #eff6ff;
+}
+
+.blue-icon {
+  color: #2563eb;
+}
+
+
+/* Top Products (Top 5 Table)*/
+
+.products-container {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* หัวข้อ */
+.chart-title-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chart-title-box h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.chart-icon-bg {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Table (ใช้ร่วมกับ Products) */
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.data-table thead th {
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.top-products-table thead th {
+  color: #111827; 
+  font-weight: 600;
+}
+
+.data-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.data-table tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  font-size: 14px;
+  color: #374151;
+}
+
+/* Product Cell  */
+
+.product-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+/* Rank & Sold */
+
+.data-table .text-center {
+  text-align: center;
+}
+
+.data-table .text-right {
+  text-align: right;
+}
+
+/* อันดับ */
+.data-table tbody td:first-child {
+  font-weight: 600;
+  color: #111827; /* orange */
+}
+
+/* Top Products Column Width */
+
+.top-products-table {
+  table-layout: fixed; 
+}
+
+/* อันดับ — แคบ */
+.top-products-table .col-rank {
+  width: 70px;
+  text-align: center;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* สินค้า — กว้างที่สุด */
+.top-products-table .col-product {
+  width: 45%;
+}
+
+/* ประเภท */
+.top-products-table .col-category {
+  width: 20%;
+}
+
+/* ขายแล้ว */
+.top-products-table .col-sold {
+  width: 120px;
+  text-align: right;
+  font-weight: 500;
+}
+
+
+
+
+/* --- Global Colors & Utility --- */
+.bg-blue-50 { background: #eff6ff; color: #2563eb; }
+.bg-indigo-50 { background: #eef2ff; color: #4f46e5; }
+.bg-emerald-50 { background: #ecfdf5; color: #059669; }
+.bg-red-100 { background: #fee2e2; }
+.text-emerald-600 { color: #059669; }
+.text-red-600 { color: #dc2626; }
+
+.main-layout { min-height: 100vh; background: #F5F7FA; display: flex; }
+.content-wrapper { flex: 1; margin-left: 256px; min-height: 100vh; overflow-x: hidden; }
+
+.chart-container {
+  width: 100%;
+  height: 320px;        /* ❗ ต้องมี ไม่งั้นกราฟไม่ขึ้น */
+  min-height: 320px;   /* ป้องกัน ResponsiveContainer คำนวณผิด */
+}
+
+.line-chart-wrapper {
+  width: 100%;
+  height: 280px;
+}
+

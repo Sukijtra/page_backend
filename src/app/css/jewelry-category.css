@@ -1,0 +1,288 @@
+/* jewelry-category.css */
+.jewelry-page-container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #F9FAFB;
+}
+
+.jewelry-main-content {
+  margin-left: 268px;
+  width: calc(100% - 268px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* Header Section */
+.jewelry-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.jewelry-header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.jewelry-header-subtitle {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Filter Bar */
+.jewelry-filter-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.jewelry-filter-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    min-width: 300px;
+}
+
+.jewelry-search-box {
+  background-color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  flex: 2;
+}
+
+.jewelry-filter-select-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 150px;
+}
+
+.jewelry-filter-select {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 2.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    background-color: white;
+    font-size: 0.875rem;
+    appearance: none;
+    cursor: pointer;
+    color: #374151;
+    outline: none;
+}
+
+.jewelry-select-icon-left {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.jewelry-select-icon-right {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.jewelry-search-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 0.875rem;
+}
+
+/* Toggle Switch */
+.jewelry-toggle-switch {
+  position: relative;
+  display: inline-flex;
+  height: 1.5rem;
+  width: 2.75rem;
+  align-items: center;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.jewelry-toggle-dot {
+  position: absolute;
+  display: inline-block;
+  height: 1rem;
+  width: 1rem;
+  border-radius: 9999px;
+  background-color: white;
+  transition: all 0.2s;
+}
+
+/* Content Wrapper */
+.jewelry-content-wrapper {
+  padding: 2.5rem;
+  max-width: 1600px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Table */
+.jewelry-table-container {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.jewelry-data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.jewelry-data-table th {
+  background-color: #F9FAFB;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.jewelry-data-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #F3F4F6;
+  color: #4B5563;
+}
+
+.jewelry-data-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Buttons and Icons */
+.jewelry-btn-add {
+  background-color: #111827;
+  color: white;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.jewelry-btn-add:hover {
+  background-color: #1f2937;
+}
+
+.jewelry-action-btn {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #9CA3AF;
+  transition: all 0.2s;
+}
+
+.jewelry-action-btn:hover {
+  background-color: #F3F4F6;
+}
+
+.jewelry-action-btn.edit:hover { color: #4F46E5; }
+.jewelry-action-btn.delete:hover { color: #EF4444; }
+
+/* Alert Modal */
+.jewelry-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.jewelry-alert-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.jewelry-alert-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jewelry-alert-icon.edit { background: #EEF2FF; color: #4F46E5; }
+.jewelry-alert-icon.delete { background: #FEF2F2; color: #EF4444; }
+
+.jewelry-alert-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.jewelry-alert-text {
+  color: #6B7280;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.jewelry-alert-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.jewelry-alert-btn.primary { background: #111827; color: white; }
+.jewelry-alert-btn.secondary { background: #F3F4F6; color: #4B5563; margin-top: 0.5rem; }
+
+/* Badges */
+.group-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.group-badge.earrings { background-color: #E0F2FE; color: #0369A1; }
+.group-badge.necklace { background-color: #FDF2F8; color: #9D174D; }
+.group-badge.bracelet { background-color: #ECFDF5; color: #065F46; }
+.group-badge.ring { background-color: #EEF2FF; color: #3730A3; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .jewelry-main-content { margin-left: 0; width: 100%; }
+}

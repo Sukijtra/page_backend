@@ -1,414 +1,724 @@
 'use client'
 
-import React, { useState } from 'react';
-import { 
-  LayoutDashboard, 
-  Gem, 
-  ShoppingCart, 
-  FileText, 
-  Users, 
-  Star, 
-  Settings, 
-  Layers,
-  DollarSign,
-  LogOut, 
-  Plus, 
-  Search, 
-  Filter, 
-  MoreHorizontal, 
-  Edit3, 
-  Trash2, 
-  PackageCheck,
-  Check, 
-  X, 
-  Eye, 
-  ChevronDown,
-  Boxes,
-  Shapes,
-  Image as ImageIcon
+import React, { useState, useEffect } from 'react';
+import {
+  Gem, Layers, Plus, Search, Filter, Edit3, Trash2, X, ChevronDown,
+  Package, Database, Sparkle
 } from 'lucide-react';
-import { Sidebar } from '../../../components/sidebar';
+import {Sidebar} from "@/components/sidebar"
+import '@/app/css/products.css';
+import { useSearchParams, useRouter } from 'next/navigation';
 
-// --- Types (Adapted from your ProductManagement.tsx) ---
-type Product = {
-  id: number;
-  name: string;
-  category: string;
-  material: string;
-  karat: string;
-  price: number;
-  stock: number;
-  status: boolean;
-  image: string;
-};
 
-type Category = { id: number; name: string; status: boolean };
-type Material = { id: number; name: string; status: boolean };
 
-// --- Mock Data ---
-const initialProducts: Product[] = [
-  { id: 1, name: "แหวนเพชรเม็ดเดี่ยว 1 กะรัต", category: "แหวน", material: "ทองคำขาว", karat: "18k", price: 45000, stock: 5, status: true, image: "💍" },
-  { id: 2, name: "สร้อยคอทองคำพร้อมจี้", category: "สร้อยคอ", material: "ทองคำ", karat: "22k", price: 28000, stock: 0, status: false, image: "📿" },
-  { id: 3, name: "ต่างหูเพชรระย้า", category: "ต่างหู", material: "ทองคำขาว", karat: "18k", price: 32000, stock: 3, status: true, image: "💎" },
-  { id: 4, name: "กำไลข้อมือเกลี้ยง", category: "กำไล", material: "ทองชมพู", karat: "18k", price: 18500, stock: 8, status: true, image: "💫" },
-  { id: 5, name: "จี้มรกตล้อมเพชร", category: "จี้", material: "ทองคำ", karat: "18k", price: 55000, stock: 2, status: true, image: "💚" },
-];
 
-const initialCategories: Category[] = [
-  { id: 1, name: "แหวน (Rings)", status: true },
-  { id: 2, name: "สร้อยคอ (Necklaces)", status: true },
-  { id: 3, name: "ต่างหู (Earrings)", status: true },
-  { id: 4, name: "กำไล (Bracelets)", status: true },
-];
-
-const initialMaterials: Material[] = [
-  { id: 1, name: "ทองคำ (Gold)", status: true },
-  { id: 2, name: "ทองคำขาว (White Gold)", status: true },
-  { id: 3, name: "ทองชมพู (Rose Gold)", status: true },
-  { id: 4, name: "แพลตตินัม (Platinum)", status: true },
-];
-
-// --- Main Content Component ---
-
-const ProductManagement = () => {
-  const [activeTab, setActiveTab] = useState<'products' | 'categories' | 'materials'>('products');
-  const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
-  const [materials, setMaterials] = useState<Material[]>(initialMaterials);
-
-    const toggleCategoryStatus = (id: number) => {
-    setCategories(prev =>
-      prev.map(cat =>
-        cat.id === id ? { ...cat, status: !cat.status } : cat
-      )
-    );
-  };
-// --- Components ---
-
-const StatCard = ({ title, value, growth, trend, icon: Icon, colorClass }: any) => (
-  <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-    <div className="flex justify-between items-start mb-4">
-      <div>
-        <h3 className="text-gray-500 text-sm font-medium mb-1">{title}</h3>
-        <div className="text-xl font-bold text-gray-800">{value}</div>
-      </div>
-      <div className={`p-2 rounded-lg ${colorClass}`}>
-        <Icon className="w-5 h-5" />
-      </div>
-    </div>
-    <div className="flex items-center gap-2">
-    </div>
-  </div>
-);
-// --- Sub-Components for Product Page ---
-const StatusSwitch = ({ status, onToggle }: { status: boolean; onToggle: () => void }) => (
-  <button
-    onClick={onToggle}
-    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-      ${status ? 'bg-emerald-500' : 'bg-gray-300'}`}
-  >
-    <span
-      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-        ${status ? 'translate-x-6' : 'translate-x-1'}`}
-    />
-  </button>
-);
-
-const TabButton = ({ active, onClick, icon: Icon, label }: any) => (
-  <button
-    onClick={onClick}
-    className={`flex items-center gap-2 px-6 py-3 text-sm font-medium border-b-2 transition-colors
-      ${active 
-        ? 'border-gray-900 text-gray-900' 
-        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-  >
-    <Icon className="w-4 h-4" />
-    {label}
+const Button = ({ children, className = "", variant = "primary", ...props }: any) => (
+  <button className={`btn btn-${variant} ${className}`} {...props}>
+    {children}
   </button>
 );
 
 
-  // Handlers (Mock logic)
-  const toggleProductStatus = (id: number) => {
-    setProducts(products.map(p => p.id === id ? { ...p, status: !p.status } : p));
+
+const Input = ({ className = "", value, ...props }: any) => (
+  <input
+    className={`custom-input ${className}`}
+    {...props}
+    value={value ?? ''}
+  />
+);
+
+export default function JewelryManagementPage() {
+
+
+  const [activeTab, setActiveTab] = useState<'products'>('products');
+
+  const [products, setProducts] = useState<any[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Constants for Dynamic Fields
+  const DIAMOND_SHAPES = ["กลม", "ทรงไข่", "ทรงหยดน้ำ", "เอเมอรัลด์คัท", "พรินเซสคัท", "มาร์คีส์", "เรเดียนท์คัท", "คุชชั่นคัท"];
+  const CLARITY_OPTIONS = ["I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF", "FL"];
+  const COLOR_OPTIONS = ["K(93)", "J(94)", "I(95)", "H(96)", "G(97)", "F(98)", "E(99)", "D(100)"];
+  const RING_STYLES = ["เม็ดเดี่ยว", "บ่าข้าง", "ล้อมเพชร", "ล้อมซ่อนฐาน", "เพชรข้าง", "ดีไซน์ธรรมชาติ"];
+  const EARRING_TYPES = ["ต่างหูเม็ดเดี่ยว", "ต่างหูห่วง", "ต่างหูห้อยระย้า"];
+  const METAL_COLORS = ["ทองขาว", "ทองคำ", "ทองชมพู", "ทองวานิลลา"];
+  const METAL_OPTIONS = ["18K", "10K", "9K"];
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('ประเภทเครื่องประดับทั้งหมด');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'closed'>('all');
+  const [shapeFilter, setShapeFilter] = useState('รูปทรงเพชรทั้งหมด');
+
+  interface ProductType {
+    product_type_id: number;
+    product_type_name: string;
+  }
+
+  const [categories, setCategories] = useState<ProductType[]>([]);
+  useEffect(() => {
+    fetch("http://localhost:8080/product-types")
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(err => console.error(err));
+  }, []);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<any | null>(null);
+
+  const [newProduct, setNewProduct] = useState({
+    product_name: '',
+    product_type: '', // เพชร, แหวนเพชร, ต่างหู, สร้อยคอพร้อมจี้, กำไลเพชร
+    price: '',
+    description: '',
+    status: 1,
+    // Dynamic Fields
+    diamond_shape: '',
+    diamond_origin: '', // LAB, NATURAL
+    clarity: '',
+    color: '',
+    carat: '',
+    ring_style: '',
+    earring_type: '',
+    metal_color: '',
+    metal_option: '',
+    images: [] as string[]
+  });
+
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  const [popup, setPopup] = useState<{
+    type: 'success' | 'error' | 'confirm' | null;
+    message: string;
+    onConfirm?: () => void;
+  }>({
+    type: null,
+    message: ''
+  });
+
+  const showPopup = (
+    type: 'success' | 'error' | 'confirm',
+    message: string,
+    onConfirm?: () => void
+  ) => {
+    setPopup({ type, message, onConfirm });
   };
 
-  const deleteProduct = (id: number) => {
-    if (confirm("ยืนยันการลบสินค้า?")) {
-      setProducts(products.filter(p => p.id !== id));
+  const closePopup = () => {
+    setPopup({ type: null, message: '' });
+  };
+
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch('http://localhost:8080/api/admin/jewelry-management');
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      setProducts(data?.products || []);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setProducts([]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return (
-    <div className="p-8 space-y-6 animate-in fade-in duration-500">
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    const result = (products || []).filter((p) => {
+      const matchSearch = (p.product_name || '').toLowerCase().includes(searchTerm.toLowerCase());
+      const matchCat = categoryFilter === 'ประเภทเครื่องประดับทั้งหมด' || p.category_name === categoryFilter;
+      const matchStatus = statusFilter === 'all' ? true : statusFilter === 'open' ? p.status === 1 : p.status === 0;
       
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">จัดการเครื่องประดับ</h2>
-          <p className="text-gray-500 text-sm mt-1">จัดการสินค้า หมวดหมู่ และวัสดุภายในร้าน</p>
-        </div>
-        <button className="bg-gray-900 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 text-sm font-medium hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200">
-          <Plus className="w-4 h-4" />
-          เพิ่มสินค้าใหม่
-        </button>
-      </div>
+      let matchShape = true;
+      if (shapeFilter !== 'รูปทรงเพชรทั้งหมด') {
+        try {
+          const specs = typeof p.product_detail === 'string' ? JSON.parse(p.product_detail) : p.product_detail;
+          matchShape = specs?.diamond_shape === shapeFilter;
+        } catch (e) {
+          matchShape = false;
+        }
+      }
 
-      {/* Tabs */}
-      <div className="bg-white rounded-t-xl border-b border-gray-200 px-2 flex">
-        <TabButton 
-          active={activeTab === 'products'} 
-          onClick={() => setActiveTab('products')} 
-          icon={Gem} 
-          label="รายการสินค้า" 
-        />
-        <TabButton 
-          active={activeTab === 'categories'} 
-          onClick={() => setActiveTab('categories')} 
-          icon={Layers} 
-          label="หมวดหมู่" 
-        />
-      </div>
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
-        <StatCard 
-          title="สิ้นค้าทั้งหมด (ชิ้น)" 
-          value="3" 
-          //growth="+20%" 
-          //trend="up" 
-          icon={Layers}
-          colorClass="bg-blue-50 text-blue-600"
-        />
-        <StatCard 
-          title="วัสดุทองคำขาวทั้งหมด (ชิ้น)" 
-          value="50" 
-          growth="+15%" 
-          trend="up" 
-          icon={PackageCheck}
-          colorClass="bg-emerald-50 text-emerald-600"
-        />
-        <StatCard 
-          title="วัสดุทองคำทั้งหมด (ชิ้น)" 
-          value="85" 
-          growth="+15%" 
-          trend="up" 
-          icon={PackageCheck}
-          colorClass="bg-emerald-50 text-emerald-600"
-          />
-        <StatCard 
-          title="วัสดุทองชมพูทั้งหมด (ชิ้น)" 
-          value="55" 
-          growth="+15%" 
-          trend="up" 
-          icon={PackageCheck}
-          colorClass="bg-emerald-50 text-emerald-600"
-        />
-      </div>
+      return matchSearch && matchCat && matchStatus && matchShape;
+    });
+    setFilteredProducts(result);
+  }, [products, searchTerm, categoryFilter, statusFilter, shapeFilter]);
 
-      {/* Content Area */}
-      <div className="bg-white rounded-b-xl rounded-tr-xl shadow-sm border border-gray-200 min-h-[500px] p-6">
-        
-        {/* --- Tab: Product List --- */}
-        {activeTab === 'products' && (
-          <div className="space-y-6">
-            {/* Filters */}
-            <div className="flex flex-col md:flex-row gap-4 justify-between">
-              <div className="relative w-full md:w-96">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+  const handleEdit = (product: any) => {
+    setEditingProduct(product);
+    
+    let specs = {
+      diamond_shape: '',
+      diamond_origin: '',
+      clarity: '',
+      color: '',
+      carat: '',
+      ring_style: '',
+      earring_type: '',
+      metal_color: '',
+      metal_option: '',
+    };
+
+    if (product.product_detail) {
+      try {
+        const parsed = typeof product.product_detail === 'string' ? JSON.parse(product.product_detail) : product.product_detail;
+        specs = { ...specs, ...parsed };
+      } catch (e) {
+        console.error("Error parsing specs", e);
+      }
+    }
+
+    setNewProduct({
+      product_name: product.product_name,
+      product_type: product.category_name,
+      price: product.price.toString(),
+      description: product.description || '',
+      status: product.status,
+      ...specs,
+      images: [] // We'll handle images separately or just keep links
+    });
+
+    // Populate previews if images exist
+    if (product.image_url) {
+      const mainImg = product.image_url.startsWith('http') ? product.image_url : `http://localhost:8080/static/uploads/${product.image_url}`;
+      setImagePreviews([mainImg]);
+    }
+
+    setIsModalOpen(true);
+  };
+
+  const handleToggleStatus = async (id: number) => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/admin/jewelry/toggle-status/${id}`, {
+        method: 'PATCH',
+      });
+      if (res.ok) {
+        setProducts(prev =>
+          prev.map(p =>
+            p.product_id === id ? { ...p, status: p.status === 1 ? 0 : 1 } : p
+          )
+        );
+      }
+    } catch (err) {
+      showPopup('error', 'ไม่สามารถอัปเดตสถานะได้');
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('คุณต้องการลบสินค้านี้ใช่หรือไม่?')) return;
+    try {
+      const res = await fetch(`http://localhost:8080/api/admin/jewelry/${id}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setProducts(prev => prev.filter(p => p.product_id !== id));
+        showPopup('success', 'ลบสินค้าสำเร็จ');
+      } else {
+        showPopup('error', 'ไม่สามารถลบสินค้าได้');
+      }
+    } catch (err) {
+      showPopup('error', 'เกิดข้อผิดพลาดในการลบสินค้า');
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      setImageFiles(prev => [...prev, ...files]);
+      
+      const newPreviews = files.map(file => URL.createObjectURL(file));
+      setImagePreviews(prev => [...prev, ...newPreviews]);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async () => {
+    if (!newProduct.product_name || !newProduct.product_type || !newProduct.price) {
+      showPopup('error', 'กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน');
+      return;
+    }
+
+    try {
+      // Simulation: Prepare image filenames
+      const imageNames = imageFiles.map(file => file.name);
+
+      const productToSave = {
+        ...newProduct,
+        price: parseFloat(newProduct.price),
+        images: imageFiles.length > 0 ? imageNames : (editingProduct?.image_url ? [editingProduct.image_url] : []),
+        specs: {
+          diamond_shape: newProduct.diamond_shape,
+          diamond_origin: newProduct.diamond_origin,
+          clarity: newProduct.clarity,
+          color: newProduct.color,
+          carat: newProduct.carat,
+          ring_style: newProduct.ring_style,
+          earring_type: newProduct.earring_type,
+          metal_color: newProduct.metal_color,
+          metal_option: newProduct.metal_option,
+        }
+      };
+
+      const url = editingProduct 
+        ? `http://localhost:8080/api/admin/jewelry/${editingProduct.product_id}`
+        : 'http://localhost:8080/api/admin/jewelry';
+      
+      const method = editingProduct ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productToSave)
+      });
+
+      if (!res.ok) throw new Error("Failed to save");
+
+      showPopup('success', editingProduct ? 'อัปเดตข้อมูลสินค้าเรียบร้อยแล้ว' : 'บันทึกสินค้าเรียบร้อยแล้ว');
+      setIsModalOpen(false);
+      resetForm();
+      loadData();
+    } catch (err) {
+      showPopup('error', 'เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+    }
+  };
+
+  const resetForm = () => {
+    setEditingProduct(null);
+    setNewProduct({
+      product_name: '',
+      product_type: '',
+      price: '',
+      description: '',
+      status: 1,
+      diamond_shape: '',
+      diamond_origin: '',
+      clarity: '',
+      color: '',
+      carat: '',
+      ring_style: '',
+      earring_type: '',
+      metal_color: '',
+      metal_option: '',
+      images: []
+    });
+    setImageFiles([]);
+    setImagePreviews([]);
+  };
+
+  const renderTypeSpecificFields = () => {
+    const type = newProduct.product_type;
+    
+    return (
+      <div className="animate-fade-in space-y-4 mt-6 border-t pt-6">
+        {/* Diamond / Lab / Natural - Common for many types */}
+        {(type === 'เพชร' || type === 'แหวนเพชร' || type === 'ต่างหู' || type === 'สร้อยคอพร้อมจี้' || type === 'กำไลเพชร') && (
+          <div className="form-grid">
+            <div className="form-group">
+              <label className="form-label">ประเภทเพชร</label>
+              <select 
+                className="custom-select"
+                value={newProduct.diamond_origin}
+                onChange={e => setNewProduct({...newProduct, diamond_origin: e.target.value})}
+              >
+                <option value="">เลือกประเภท...</option>
+                <option value="เพชรธรรมชาติ">เพชรธรรมชาติ</option>
+                <option value="เพชรแล็บ">เพชรแล็บ</option>
+              </select>
+            </div>
+            {(type === 'เพชร' || type === 'แหวนเพชร') && (
+              <div className="form-group">
+                <label className="form-label">กะรัต</label>
                 <input 
                   type="text" 
-                  placeholder="ค้นหาชื่อสินค้า, รหัส, หมวดหมู่..." 
-                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900/20 focus:border-gray-900 text-sm"
+                  className="custom-input" 
+                  placeholder="เช่น 1.05"
+                  value={newProduct.carat}
+                  onChange={e => setNewProduct({...newProduct, carat: e.target.value})}
                 />
               </div>
-              <div className="flex gap-3">
-                <button className="px-4 py-2 border border-gray-200 rounded-lg flex items-center gap-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
-                  <Filter className="w-4 h-4" />
-                  ตัวกรอง
-                </button>
-                <button className="px-4 py-2 border border-gray-200 rounded-lg flex items-center gap-2 text-sm font-medium text-gray-600 hover:bg-gray-50">
-                  <ChevronDown className="w-4 h-4" />
-                  สถานะ
-                </button>
-              </div>
-            </div>
-
-            {/* Table */}
-            <div className="overflow-x-auto rounded-lg border border-gray-200">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 text-gray-600 font-medium">
-                  <tr>
-                    <th className="px-6 py-4">สินค้า</th>
-                    <th className="px-6 py-4">หมวดหมู่</th>
-                    <th className="px-6 py-4">วัสดุ</th>
-                    <th className="px-6 py-4 text-right">ราคา</th>
-                    <th className="px-6 py-4 text-center">คงเหลือ</th>
-                    <th className="px-6 py-4">สถานะ</th>
-                    <th className="px-6 py-4 text-right">จัดการ</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {products.map((product) => (
-                    <tr key={product.id} className="hover:bg-gray-50/50 transition-colors group">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-xl border border-gray-200">
-                            {product.image}
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">{product.name}</p>
-                            <p className="text-xs text-gray-400">ID: #PROD-{product.id.toString().padStart(4, '0')}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 text-gray-600">{product.category}</td>
-                      <td className="px-6 py-4 text-gray-600">
-                        {product.material} <span className="text-gray-400 text-xs ml-1">({product.karat})</span>
-                      </td>
-                      <td className="px-6 py-4 text-right font-medium text-gray-900">
-                        ฿{product.price.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 text-center">
-                        <span className={`inline-block px-2 py-1 rounded text-xs font-medium 
-                          ${product.stock === 0 ? 'bg-red-100 text-red-700' : product.stock < 5 ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-700'}`}>
-                          {product.stock === 0 ? 'หมด' : `${product.stock} ชิ้น`}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <StatusSwitch
-                          status={product.status}
-                          onToggle={() => toggleProductStatus(product.id)}
-                        />
-                      </td>
-
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg" title="แก้ไข">
-                            <Edit3 className="w-4 h-4" />
-                          </button>
-                          
-                          <button 
-                            onClick={() => deleteProduct(product.id)}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg" title="ลบ">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            
-            {/* Pagination Mockup */}
-            <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-               <p className="text-xs text-gray-500">แสดง 1-5 จากทั้งหมด 24 รายการ</p>
-               <div className="flex gap-1">
-                 <button className="px-3 py-1 text-xs border rounded hover:bg-gray-50 disabled:opacity-50" disabled>ก่อนหน้า</button>
-                 <button className="px-3 py-1 text-xs border bg-gray-900 text-white rounded">1</button>
-                 <button className="px-3 py-1 text-xs border rounded hover:bg-gray-50">2</button>
-                 <button className="px-3 py-1 text-xs border rounded hover:bg-gray-50">3</button>
-                 <button className="px-3 py-1 text-xs border rounded hover:bg-gray-50">ถัดไป</button>
-               </div>
-            </div>
+            )}
           </div>
         )}
 
-        {/* --- Tab: Categories --- */}
-        {activeTab === 'categories' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-gray-900">หมวดหมู่หลัก</h3>
-                <button className="text-xs flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium">
-                  <Plus className="w-3 h-3" /> เพิ่มหมวดหมู่
-                </button>
-              </div>
-              <div className="border rounded-xl divide-y divide-gray-100 overflow-hidden">
-                {categories.map(cat => (
-                  <div key={cat.id} className="p-4 flex items-center justify-between bg-white hover:bg-gray-50 group">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
-                        <Layers className="w-4 h-4" />
-                      </div>
-                      <span className="text-sm font-medium text-gray-700">{cat.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2 opacity-50 group-hover:opacity-100">
-                      <StatusSwitch
-                      status={cat.status}
-                      onToggle={() => toggleCategoryStatus(cat.id)}
-/>
-
-                      <button className="p-1.5 hover:bg-gray-200 rounded text-gray-500"><Edit3 className="w-3 h-3" /></button>
-                    </div>
-                  </div>
+        {/* Clarity & Color - Better UI with Buttons */}
+        {(type === 'เพชร' || type === 'แหวนเพชร' || type === 'ต่างหู' || type === 'สร้อยคอพร้อมจี้' || type === 'กำไลเพชร') && (
+          <div className="space-y-4">
+            <div className="form-group">
+              <label className="form-label">ความสะอาด (Clarity)</label>
+              <div className="flex flex-wrap gap-2">
+                {CLARITY_OPTIONS.map(opt => (
+                  <button 
+                    key={opt}
+                    type="button"
+                    onClick={() => setNewProduct({...newProduct, clarity: opt})}
+                    className={`px-3 py-1.5 text-xs rounded-md border transition-all ${newProduct.clarity === opt ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white text-gray-600 border-gray-200'}`}
+                  >
+                    {opt}
+                  </button>
                 ))}
               </div>
             </div>
-            
-            {/* Placeholder for Subcategories or visual balance */}
-            <div className="bg-gray-50 rounded-xl border border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
-               <ImageIcon className="w-12 h-12 mb-3 opacity-20" />
-               <p className="text-sm">เลือกหมวดหมู่หลักเพื่อดูหมวดหมู่ย่อย</p>
+            <div className="form-group">
+              <label className="form-label">สี/น้ำ (Color)</label>
+              <div className="flex flex-wrap gap-2">
+                {COLOR_OPTIONS.map(opt => (
+                  <button 
+                    key={opt}
+                    type="button"
+                    onClick={() => setNewProduct({...newProduct, color: opt})}
+                    className={`px-3 py-1.5 text-xs rounded-md border transition-all ${newProduct.color === opt ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-gray-600 border-gray-200'}`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
 
-        {/* --- Tab: Materials --- */}
-        {activeTab === 'materials' && (
-           <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                 <h3 className="font-semibold text-gray-900">รายการวัสดุ (Materials)</h3>
-                 <button className="bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50">
-                    จัดการ Karat / Purity
-                 </button>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                 {materials.map(mat => (
-                    <div key={mat.id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow relative group">
-                       <div className="flex justify-between items-start">
-                          <div className="flex items-center gap-3 mb-3">
-                             <div className="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center text-yellow-600">
-                                <Shapes className="w-5 h-5" />
-                             </div>
-                             <div>
-                                <h4 className="font-medium text-gray-900">{mat.name}</h4>
-                                <p className="text-xs text-gray-500">4 รูปแบบ (Karats)</p>
-                             </div>
-                          </div>
-                          <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute top-4 right-4">
-                             <button className="text-gray-400 hover:text-gray-600"><MoreHorizontal className="w-5 h-5" /></button>
-                          </div>
-                       </div>
-                       <div className="flex gap-2 mt-2">
-                          <span className="px-2 py-1 bg-gray-100 rounded text-[10px] text-gray-600">14k</span>
-                          <span className="px-2 py-1 bg-gray-100 rounded text-[10px] text-gray-600">18k</span>
-                          <span className="px-2 py-1 bg-gray-100 rounded text-[10px] text-gray-600">22k</span>
-                          <span className="px-2 py-1 bg-gray-100 rounded text-[10px] text-gray-600">24k</span>
-                       </div>
-                    </div>
-                 ))}
-                 <button className="border border-dashed border-gray-300 rounded-xl p-4 flex flex-col items-center justify-center text-gray-400 hover:border-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-all h-full min-h-[120px]">
-                    <Plus className="w-8 h-8 mb-2" />
-                    <span className="text-sm font-medium">เพิ่มวัสดุใหม่</span>
-                 </button>
-              </div>
-           </div>
+        {/* Shape Selection */}
+        {(type === 'แหวนเพชร' || type === 'ต่างหู' || type === 'เพชร' || type === 'สร้อยคอพร้อมจี้' || type === 'กำไลเพชร') && (
+          <div className="form-group">
+            <label className="form-label">รูปทรงเพชร</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {DIAMOND_SHAPES.map(shape => (
+                <button 
+                  key={shape}
+                  type="button"
+                  onClick={() => setNewProduct({...newProduct, diamond_shape: shape})}
+                  className={`p-2 text-xs rounded-lg border transition-all ${newProduct.diamond_shape === shape ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-600 border-gray-200'}`}
+                >
+                  {shape}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
 
-      </div>
-    </div>
-  );
-};
+        {/* Ring Style Specific */}
+        {type === 'แหวนเพชร' && (
+          <div className="form-group">
+            <label className="form-label">สไตล์แหวน</label>
+            <div className="grid grid-cols-2 gap-2">
+              {RING_STYLES.map(style => (
+                <button 
+                  key={style}
+                  type="button"
+                  onClick={() => setNewProduct({...newProduct, ring_style: style})}
+                  className={`p-2 text-xs rounded-lg border transition-all ${newProduct.ring_style === style ? 'bg-amber-500 text-white border-amber-500' : 'bg-gray-50 text-gray-600 border-gray-200'}`}
+                >
+                  {style}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
-// --- App Container ---
-export default function App() {
+        {/* Earring Type Specific */}
+        {type === 'ต่างหู' && (
+          <div className="form-group">
+            <label className="form-label">ประเภทต่างหู</label>
+            <div className="grid grid-cols-3 gap-2">
+              {EARRING_TYPES.map(etype => (
+                <button 
+                  key={etype}
+                  type="button"
+                  onClick={() => setNewProduct({...newProduct, earring_type: etype})}
+                  className={`p-2 text-xs rounded-lg border transition-all ${newProduct.earring_type === etype ? 'bg-blue-500 text-white border-blue-500' : 'bg-gray-50 text-gray-600 border-gray-200'}`}
+                >
+                  {etype}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Metal Selection - For Jewelry */}
+        {(type === 'แหวนเพชร' || type === 'ต่างหู' || type === 'สร้อยคอพร้อมจี้' || type === 'กำไลเพชร') && (
+          <div className="form-grid">
+            <div className="form-group">
+              <label className="form-label">สีโลหะ</label>
+              <select 
+                className="custom-select"
+                value={newProduct.metal_color}
+                onChange={e => setNewProduct({...newProduct, metal_color: e.target.value})}
+              >
+                <option value="">เลือกสีโลหะ...</option>
+                {METAL_COLORS.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="form-label">ตัวเลือกโลหะ</label>
+              <select 
+                className="custom-select"
+                value={newProduct.metal_option}
+                onChange={e => setNewProduct({...newProduct, metal_option: e.target.value})}
+              >
+                <option value="">เลือกตัวเลือก...</option>
+                {METAL_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+              </select>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-[#F5F7FA] font-sans text-gray-900 flex">
+    <div className="page-container">
       <Sidebar />
-      <main className="flex-1 ml-64 min-h-screen overflow-x-hidden">
-        <ProductManagement />
+      <main className="main-content">
+        <div className="content-wrapper">
+          <div className="header-section">
+            <div>
+              <h1 className="header-title">จัดการสินค้า</h1>
+              <p className="header-subtitle">เพิ่มและจัดการรายการสินค้าเครื่องประดับพร้อมรายละเอียดเชิงลึก</p>
+            </div>
+            <button className="btn btn-primary" onClick={() => { resetForm(); setIsModalOpen(true); }}>
+              <Plus size={18} />
+              <span>เพิ่มสินค้าใหม่</span>
+            </button>
+          </div>
+
+          <div className="animate-fade-in">
+            <div className="filter-grid">
+              <div className="input-wrapper">
+                <Search className="input-icon left" size={18} />
+                <input
+                  type="text"
+                  placeholder="ค้นหาชื่อสินค้า..."
+                  className="custom-input with-left-icon"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="input-wrapper">
+                <Filter className="input-icon left" size={18} />
+                <select
+                  className="custom-select with-left-icon"
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                >
+                  <option value="ประเภทเครื่องประดับทั้งหมด">ประเภทเครื่องประดับทั้งหมด</option>
+                  {categories.map((cat, idx) => (
+                    <option key={idx} value={cat.product_type_name}>{cat.product_type_name}</option>
+                  ))}
+                </select>
+                <ChevronDown className="input-icon right" size={18} />
+              </div>
+              <div className="input-wrapper">
+                <Database className="input-icon left" size={18} />
+                <select
+                  className="custom-select with-left-icon"
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as any)}
+                >
+                  <option value="all">สถานะทั้งหมด</option>
+                  <option value="open">เปิดใช้งาน</option>
+                  <option value="closed">ปิดใช้งาน</option>
+                </select>
+                <ChevronDown className="input-icon right" size={18} />
+              </div>
+
+              <div className="input-wrapper">
+                <Gem className="input-icon left" size={18} />
+                <select
+                  className="custom-select with-left-icon"
+                  value={shapeFilter}
+                  onChange={(e) => setShapeFilter(e.target.value)}
+                >
+                  <option value="รูปทรงเพชรทั้งหมด">รูปทรงเพชรทั้งหมด</option>
+                  {DIAMOND_SHAPES.map((shape, idx) => (
+                    <option key={idx} value={shape}>{shape}</option>
+                  ))}
+                </select>
+                <ChevronDown className="input-icon right" size={18} />
+              </div>
+            </div>
+
+            <div className="table-container">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>ข้อมูลสินค้า</th>
+                    <th>ราคา</th>
+                    <th>หมวดหมู่</th>
+                    <th className="text-center">สถานะ</th>
+                    <th className="text-right">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {isLoading ? (
+                    <tr><td colSpan={5} className="text-center py-10">กำลังโหลด...</td></tr>
+                  ) : filteredProducts.length === 0 ? (
+                    <tr><td colSpan={5} className="text-center py-10">ไม่พบข้อมูลสินค้า</td></tr>
+                  ) : (
+                    filteredProducts.map((p) => (
+                      <tr key={p.product_id}>
+                        <td>
+                          <div className="product-cell">
+                            <div className="product-icon-box">
+                              {p.image_url ? (
+                                <img src={p.image_url.startsWith('http') ? p.image_url : `http://localhost:8080/static/uploads/${p.image_url}`} alt={p.product_name} className="w-full h-full object-cover rounded-md" />
+                              ) : <Gem size={20} className="text-gray-400" />}
+                            </div>
+                            <div>
+                              <div className="font-bold text-gray-900">{p.product_name}</div>
+                              <div className="flex gap-2 items-center">
+                                <span className="text-xs text-gray-400">ID: #{p.product_id}</span>
+                                {p.product_detail && (
+                                  <span className="text-[10px] bg-blue-50 text-blue-500 px-1.5 py-0.5 rounded border border-blue-100 uppercase">
+                                    {(() => {
+                                      try {
+                                        const specs = typeof p.product_detail === 'string' ? JSON.parse(p.product_detail) : p.product_detail;
+                                        return specs?.diamond_shape || '';
+                                      } catch(e) { return ''; }
+                                    })()}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="font-semibold">{p.price.toLocaleString()} ฿</td>
+                        <td>
+                          <span className="px-3 py-1 bg-gray-100 rounded-full text-xs font-medium text-gray-600">
+                            {p.category_name || 'ไม่ได้ระบุ'}
+                          </span>
+                        </td>
+                        <td className="text-center">
+                          <button onClick={() => handleToggleStatus(p.product_id)} className="toggle-switch" style={{ backgroundColor: p.status === 1 ? '#10B981' : '#D1D5DB' }}>
+                            <span className="toggle-dot" style={{ transform: p.status === 1 ? 'translateX(1.25rem)' : 'translateX(0.25rem)' }} />
+                          </button>
+                        </td>
+                        <td className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <button className="btn-ghost p-2 rounded-full hover:bg-gray-100" onClick={() => handleEdit(p)}><Edit3 size={18} /></button>
+                            <button className="btn-danger p-2 rounded-full hover:bg-red-50 text-gray-400 hover:text-red-500" onClick={() => handleDelete(p.product_id)}><Trash2 size={18} /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </main>
+
+      {/* Add/Edit Product Modal */}
+      {isModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-content max-w-2xl" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="text-xl font-bold">{editingProduct ? 'แก้ไขสินค้า' : 'เพิ่มสินค้าใหม่'}</h2>
+              <button className="p-2 hover:bg-gray-100 rounded-full" onClick={() => setIsModalOpen(false)}><X size={20} /></button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-group full-width">
+                  <label className="form-label">ชื่อสินค้า</label>
+                  <input 
+                    type="text" 
+                    className="custom-input" 
+                    placeholder="เช่น แหวนเพชรเม็ดเดี่ยว 18K"
+                    value={newProduct.product_name}
+                    onChange={e => setNewProduct({...newProduct, product_name: e.target.value})}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">ประเภทสินค้า</label>
+                  <select 
+                    className="custom-select"
+                    value={newProduct.product_type}
+                    onChange={e => setNewProduct({...newProduct, product_type: e.target.value})}
+                  >
+                    <option value="">เลือกประเภท...</option>
+                    <option value="เพชร">เพชร</option>
+                    <option value="แหวนเพชร">แหวนเพชร</option>
+                    <option value="ต่างหู">ต่างหู</option>
+                    <option value="สร้อยคอพร้อมจี้">สร้อยคอพร้อมจี้</option>
+                    <option value="กำไลเพชร">กำไลเพชร</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">ราคา (บาท)</label>
+                  <input 
+                    type="number" 
+                    className="custom-input" 
+                    placeholder="0.00"
+                    value={newProduct.price}
+                    onChange={e => setNewProduct({...newProduct, price: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              {renderTypeSpecificFields()}
+
+              <div className="form-group mt-6">
+                <label className="form-label">รายละเอียดเพิ่มเติม</label>
+                <textarea 
+                  className="custom-input min-h-[100px]" 
+                  placeholder="ระบุรายละเอียดสินค้า..."
+                  value={newProduct.description}
+                  onChange={e => setNewProduct({...newProduct, description: e.target.value})}
+                ></textarea>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">รูปภาพสินค้า (อัปโหลดได้หลายรูป)</label>
+                <div className="image-upload-container">
+                  {imagePreviews.map((preview, idx) => (
+                    <div key={idx} className="image-preview">
+                      <img src={preview} alt="preview" />
+                      <button className="remove-image" onClick={() => removeImage(idx)}><X size={14} /></button>
+                    </div>
+                  ))}
+                  <label className="upload-placeholder">
+                    <Plus size={24} />
+                    <span className="text-[10px] mt-1">เพิ่มรูป</span>
+                    <input type="file" multiple className="hidden-input" onChange={handleImageChange} accept="image/*" />
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-8">
+                <button className="btn btn-primary flex-1 py-3" onClick={handleSubmit}>
+                  {editingProduct ? 'บันทึกการแก้ไข' : 'บันทึกข้อมูลสินค้า'}
+                </button>
+                <button className="btn btn-outline flex-1 py-3" onClick={() => setIsModalOpen(false)}>ยกเลิก</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notifications / Popups */}
+      {popup.type && (
+        <div className="modal-overlay">
+          <div className="modal-content max-w-sm p-6 text-center">
+            <div className={`w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center ${
+              popup.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+            }`}>
+              {popup.type === 'success' ? <Package size={24} /> : <X size={24} />}
+            </div>
+            <h3 className="text-lg font-bold mb-2">{popup.type === 'success' ? 'สำเร็จ!' : 'แจ้งเตือน'}</h3>
+            <p className="text-gray-600 mb-6">{popup.message}</p>
+            <button className="btn btn-primary w-full" onClick={closePopup}>ตกลง</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

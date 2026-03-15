@@ -1,0 +1,301 @@
+/* metal-category.css */
+.metal-page-container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #F9FAFB;
+}
+
+.metal-main-content {
+  margin-left: 268px;
+  width: calc(100% - 268px);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.metal-content-wrapper {
+  padding: 2.5rem;
+  max-width: 1600px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Header */
+.metal-header-section {
+  margin-bottom: 2rem;
+}
+
+.metal-header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.metal-header-subtitle {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Dual Card Layout */
+.metal-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.metal-card {
+  background: white;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+}
+
+.metal-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.metal-card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Filter/Search within card */
+.metal-card-filter {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.metal-search-box {
+  background-color: #F9FAFB;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.75rem;
+  border: 1px solid #E5E7EB;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.metal-search-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 0.875rem;
+  background: transparent;
+}
+
+/* Table styles */
+.metal-table-container {
+  overflow-x: auto;
+}
+
+.metal-data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.metal-data-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #6B7280;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.metal-data-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #F3F4F6;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.metal-data-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Buttons */
+.metal-btn-add-sm {
+  background-color: #111827;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.metal-btn-add-sm:hover {
+  background-color: #1f2937;
+  transform: translateY(-1px);
+}
+
+.metal-action-btn {
+  padding: 0.375rem;
+  border-radius: 0.375rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #9CA3AF;
+  transition: all 0.2s;
+}
+
+.metal-action-btn:hover {
+  background-color: #F3F4F6;
+}
+
+.metal-action-btn.edit:hover { color: #4F46E5; }
+.metal-action-btn.delete:hover { color: #EF4444; }
+
+/* Modal styles copied from jewelry with adjustments */
+.metal-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.metal-alert-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.metal-alert-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  margin: 0 auto 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metal-alert-icon.edit { background: #EEF2FF; color: #4F46E5; }
+.metal-alert-icon.delete { background: #FEF2F2; color: #EF4444; }
+
+.metal-alert-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.metal-alert-text {
+  color: #6B7280;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.metal-alert-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.metal-alert-btn.primary { background: #111827; color: white; }
+.metal-alert-btn.secondary { background: #F3F4F6; color: #4B5563; margin-top: 0.5rem; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .metal-cards-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .metal-main-content { margin-left: 0; width: 100%; }
+}
+/* Switch Toggle */
+.metal-status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.metal-status-badge.open {
+  background-color: #ECFDF5;
+  color: #059669;
+}
+
+.metal-status-badge.closed {
+  background-color: #F3F4F6;
+  color: #6B7280;
+}
+
+.metal-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.metal-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.metal-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #E5E7EB;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.metal-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+input:checked + .metal-slider {
+  background-color: #111827;
+}
+
+input:checked + .metal-slider:before {
+  transform: translateX(20px);
+}
