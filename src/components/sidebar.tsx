@@ -62,7 +62,7 @@ export const Sidebar = () => {
         />
         <div>
           <h1 className="font-bold text-l tracking-wide">Nudee Lucky</h1>
-          <p className="text-xs text-gray-600">Game & Jewely</p>
+          <p className="text-xs text-gray-600">Game & Jewely. </p>
         </div>
       </div>
 
