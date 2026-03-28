@@ -283,7 +283,7 @@
 }
 
 input:checked + .diamond-slider {
-  background-color: #111827;
+  background-color: #21B37A;
 }
 
 input:checked + .diamond-slider:before {

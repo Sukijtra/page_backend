@@ -4,28 +4,28 @@ import React, { useState, useEffect } from "react"
 import { Sidebar } from "@/components/sidebar"
 import { Search, Plus, Edit3, Trash2, LayoutGrid, Palette, Gem, Box } from "lucide-react"
 import "@/app/css/diamond-category.css"
-
+const API = "http://localhost:8080";
 interface DiamondCategory {
   id: number;
   name: string;
-  status: number; // 1 = open, 0 = closed
+  status: number; 
 }
 
 type GroupType = 'shape' | 'clarity' | 'color';
 
 export default function DiamondCategoryPage() {
-  // 1. Shapes
+  
   const [shapes, setShapes] = useState<DiamondCategory[]>([]);
   useEffect(() => {
     const fetchShapes = async () => {
       try {
-        const res = await fetch("http://localhost:8080/diamond-shapes");
+        const res = await fetch(`${API}/diamond-shapes`)
         const data = await res.json();
 
         const formatted = data.map((item: any) => ({
           id: item.diamond_shape_id,
           name: item.diamond_shape_name,
-          status: item.status ?? 1
+          status: Number(item.status)
         }));
 
         setShapes(formatted);
@@ -36,30 +36,61 @@ export default function DiamondCategoryPage() {
 
     fetchShapes();
   }, []);
-  // 2. Clarity (ความสะอาด)
-  const [clarity, setClarity] = useState<DiamondCategory[]>([
-    { id: 101, name: "I1", status: 1 },
-    { id: 102, name: "SI2", status: 1 },
-    { id: 103, name: "SI1", status: 1 },
-    { id: 104, name: "VS2", status: 1 },
-    { id: 105, name: "VS1", status: 1 },
-    { id: 106, name: "VVS2", status: 1 },
-    { id: 107, name: "VVS1", status: 1 },
-    { id: 108, name: "IF", status: 1 },
-    { id: 109, name: "FL", status: 1 }
-  ]);
+  
+  const [clarity, setClarity] = useState<DiamondCategory[]>([]);
+  useEffect(() => {
+    const fetchClarity = async () => {
+      try {
 
-  // 3. Color (น้ำ/สี)
-  const [colors, setColors] = useState<DiamondCategory[]>([
-    { id: 201, name: "K(93)", status: 1 },
-    { id: 202, name: "J(94)", status: 1 },
-    { id: 203, name: "I(95)", status: 1 },
-    { id: 204, name: "H(96)", status: 1 },
-    { id: 205, name: "G(97)", status: 1 },
-    { id: 206, name: "F(98)", status: 1 },
-    { id: 207, name: "E(99)", status: 1 },
-    { id: 208, name: "D(100)", status: 1 }
-  ]);
+        const res = await fetch(`${API}/diamond-clarity`);
+        const data = await res.json();
+
+        const formatted = data.map((item: any) => ({
+          id: item.id,
+          name: item.clarity_grade,
+          status: Number(item.status)
+        }));
+
+        setClarity(formatted);
+
+      } catch (error) {
+        console.error("โหลด clarity ไม่สำเร็จ", error);
+      }
+    };
+
+    fetchClarity();
+
+  }, []);
+
+  
+  const [colors, setColors] = useState<DiamondCategory[]>([]);
+  useEffect(() => {
+
+    const fetchColors = async () => {
+
+      try {
+
+        const res = await fetch(`${API}/diamond-colors`)
+        const data = await res.json();
+
+        const formatted = data.map((item: any) => ({
+          id: item.id,
+          name: item.color_grade,
+          status: Number(item.status)
+        }));
+
+        setColors(formatted);
+
+      } catch (error) {
+
+        console.error("โหลด colors ไม่สำเร็จ", error);
+
+      }
+    };
+
+    fetchColors();
+
+  }, []);
 
   const [searchShapes, setSearchShapes] = useState("");
   const [searchClarity, setSearchClarity] = useState("");
@@ -84,7 +115,8 @@ export default function DiamondCategoryPage() {
     const newStatus = currentStatus === 1 ? 0 : 1;
 
     if (group === "shape") {
-      await fetch(`http://localhost:8080/diamond-shapes/${id}/status`, {
+
+     await fetch(`${API}/diamond-shapes/${id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
@@ -100,6 +132,15 @@ export default function DiamondCategoryPage() {
     }
 
     else if (group === "clarity") {
+
+      await fetch(`${API}/diamond-clarity/${id}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+
       setClarity(prev =>
         prev.map(item =>
           item.id === id ? { ...item, status: newStatus } : item
@@ -108,6 +149,15 @@ export default function DiamondCategoryPage() {
     }
 
     else if (group === "color") {
+
+      await fetch(`${API}/diamond-colors/${id}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+
       setColors(prev =>
         prev.map(item =>
           item.id === id ? { ...item, status: newStatus } : item
@@ -130,43 +180,159 @@ export default function DiamondCategoryPage() {
     setAlert({ type: 'add', item: null, group });
   };
 
-  const confirmDelete = () => {
-    if (alert.item) {
-      const filter = (prev: DiamondCategory[]) => prev.filter(t => t.id !== alert.item!.id);
-      if (alert.group === 'shape') setShapes(filter);
-      else if (alert.group === 'clarity') setClarity(filter);
-      else if (alert.group === 'color') setColors(filter);
+  const confirmDelete = async () => {
 
-      setAlert(prev => ({ ...prev, type: 'success' }));
-      setTimeout(closeAlert, 1500);
+  if (!alert.item) return;
+
+  try {
+
+    if (alert.group === "shape") {
+
+      await fetch(`${API}/diamond-shapes/${alert.item.id}`, {
+        method: "DELETE"
+      });
+
     }
-  };
 
-  const handleSaveEdit = () => {
-    if (alert.item && editName.trim()) {
-      const update = (prev: DiamondCategory[]) => prev.map(t => t.id === alert.item!.id ? { ...t, name: editName } : t);
-      if (alert.group === 'shape') setShapes(update);
-      else if (alert.group === 'clarity') setClarity(update);
-      else if (alert.group === 'color') setColors(update);
+    else if (alert.group === "clarity") {
 
-      setAlert(prev => ({ ...prev, type: 'success' }));
-      setTimeout(closeAlert, 1500);
+      await fetch(`${API}/diamond-clarity/${alert.item.id}`, {
+        method: "DELETE"
+      });
+
     }
-  };
 
-  const confirmAdd = () => {
-    if (newName.trim()) {
-      const getNextId = (list: DiamondCategory[], start: number) => list.length > 0 ? Math.max(...list.map(t => t.id)) + 1 : start;
-      const newItem = (id: number) => ({ id, name: newName.trim(), status: 1 });
+    else if (alert.group === "color") {
 
-      if (alert.group === 'shape') setShapes(prev => [...prev, newItem(getNextId(shapes, 1))]);
-      else if (alert.group === 'clarity') setClarity(prev => [...prev, newItem(getNextId(clarity, 101))]);
-      else if (alert.group === 'color') setColors(prev => [...prev, newItem(getNextId(colors, 201))]);
+      await fetch(`${API}/diamond-colors/${alert.item.id}`, {
+        method: "DELETE"
+      });
 
-      setAlert(prev => ({ ...prev, type: 'success' }));
-      setTimeout(closeAlert, 1500);
     }
-  };
+
+    location.reload();
+
+  } catch (error) {
+    console.error("ลบไม่สำเร็จ", error);
+  }
+
+};
+
+  const handleSaveEdit = async () => {
+
+  if (!alert.item || !editName.trim()) return;
+
+  try {
+
+    if (alert.group === "shape") {
+
+      await fetch(`${API}/diamond-shapes/${alert.item.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          diamond_shape_name: editName
+        })
+      });
+
+    }
+
+    else if (alert.group === "clarity") {
+
+      await fetch(`${API}/diamond-clarity/${alert.item.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          clarity_grade: editName,
+          clarity_score: 0
+        })
+      });
+
+    }
+
+    else if (alert.group === "color") {
+
+      await fetch(`${API}/diamond-colors/${alert.item.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          color_grade: editName,
+          color_score: 0
+        })
+      });
+
+    }
+
+    location.reload();
+
+  } catch (error) {
+    console.error("แก้ไขไม่สำเร็จ", error);
+  }
+
+};
+
+  const confirmAdd = async () => {
+
+  if (!newName.trim()) return;
+
+  try {
+
+    if (alert.group === "shape") {
+
+      await fetch(`${API}/diamond-shapes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          diamond_shape_name: newName
+        })
+      });
+
+    }
+
+    else if (alert.group === "clarity") {
+
+      await fetch(`${API}/diamond-clarity`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          clarity_grade: newName,
+          clarity_score: 0
+        })
+      });
+
+    }
+
+    else if (alert.group === "color") {
+
+      await fetch(`${API}/diamond-colors`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          color_grade: newName,
+          color_score: 0
+        })
+      });
+
+    }
+
+    location.reload();
+
+  } catch (error) {
+    console.error("เพิ่มข้อมูลไม่สำเร็จ", error);
+  }
+
+};
 
   const closeAlert = () => {
     setAlert({ type: null, item: null, group: 'shape' });
@@ -264,7 +430,7 @@ export default function DiamondCategoryPage() {
           <div className="diamond-header-section" style={{ marginBottom: '2.5rem' }}>
             <div>
               <h1 className="diamond-header-title">จัดการหมวดหมู่เพชร</h1>
-              <p className="diamond-header-subtitle">จัดการคุณลักษณะของเพชร (ทรง, ความสะอาด, สี) แยกตามกลุ่ม</p>
+              <p className="diamond-header-subtitle">จัดการคุณลักษณะของเพชร (ทรง, ความสะอาด, สี) </p>
             </div>
           </div>
 

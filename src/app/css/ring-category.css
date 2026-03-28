@@ -1,0 +1,110 @@
+/* src/app/css/ring-category.css */
+.ring-page-container {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #F9FAFB;
+}
+
+.ring-main-content {
+  margin-left: 268px; /* เว้นพื้นที่สำหรับ Sidebar */
+  width: calc(100% - 268px);
+  padding: 2.5rem;
+}
+
+.ring-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* แบ่ง 2 คอลัมน์เหมือนหน้าโลหะ */
+  gap: 2rem;
+}
+
+.ring-card {
+  background: white;
+  border-radius: 2rem; /* ปรับให้โค้งมนมากขึ้นตามรูป */
+  padding: 2rem;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+/* หัวข้อภายในการ์ด */
+.ring-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+/* ปุ่มเพิ่มสีดำตามรูป */
+.ring-btn-add {
+  background-color: #111827;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ring-btn-add:hover {
+  background-color: #000000;
+  transform: translateY(-1px);
+}
+
+/* ช่องค้นหาแบบโค้งมน */
+.ring-search-wrapper {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.ring-search-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  background-color: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 1rem;
+  outline: none;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.ring-search-input:focus {
+  border-color: #D1D5DB;
+  background-color: #ffffff;
+}
+
+/* ส่วนของปุ่ม Switch สีเขียว */
+.ring-status-toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: #21B37A; /* สีเขียวเปิดใช้งาน */
+  position: relative;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.ring-toggle-dot {
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  transition: all 0.3s;
+}
+
+/* Badge คำว่า "เปิดใช้งาน" */
+.status-badge-active {
+  background-color: #ECFDF5;
+  color: #059669;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}

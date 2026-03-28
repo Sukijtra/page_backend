@@ -5,32 +5,64 @@ import { Sidebar } from "@/components/sidebar"
 import { Search, Plus, Edit3, Trash2, LayoutGrid, X, AlertCircle, Palette } from "lucide-react"
 import "@/app/css/metal-category.css"
 
+const API = "http://localhost:8080";
+
+
 interface MetalCategory {
   id: number;
   name: string;
-  status: number; // 1 = open, 0 = closed
+  status: number;
 }
 
 export default function MetalCategoryPage() {
-  // กลุ่ม 1: สีทองขาว, สีทอง, สีทองชมพู 
-  const [metalGroup1, setMetalGroup1] = useState<MetalCategory[]>([
-    { id: 1, name: "สีทองขาว", status: 1 },
-    { id: 2, name: "สีทอง", status: 1 },
-    { id: 3, name: "สีทองชมพู", status: 1 }
-  ]);
 
-  // กลุ่ม 2: ความหนาแน่นโลหะ
-  const [metalGroupDensity, setMetalGroupDensity] = useState<MetalCategory[]>([
-    { id: 101, name: "18K", status: 1 },
-    { id: 102, name: "10K", status: 1 },
-    { id: 103, name: "9K", status: 1 }
-  ]);
+  const [metalGroup1, setMetalGroup1] = useState<MetalCategory[]>([]);
+  useEffect(() => {
+    fetchColors();
+    fetchDensity();
+  }, []);
+  const fetchColors = async () => {
+  try {
+    const res = await fetch(`${API}/base-colors`);
+    const data = await res.json();
+    console.log("Color Data:", data[0]); 
+
+    const formatted = data.map((item: any) => ({
+     
+      id: item.id || item.base_color_id, 
+      name: item.color_name,
+      status: item.status ?? 1
+    }));
+    setMetalGroup1(formatted);
+  } catch (err) {
+    console.error("โหลดสีโลหะไม่สำเร็จ", err);
+  }
+};
+
+  const [metalGroupDensity, setMetalGroupDensity] = useState<MetalCategory[]>([]);
+  const fetchDensity = async () => {
+    try {
+      const res = await fetch(`${API}/bases`);
+      const data = await res.json();
+
+      const formatted = data.map((item: any) => ({
+        id: item.base_id,
+        name: item.base_density,
+        status: item.status ?? 1
+      }));
+
+      setMetalGroupDensity(formatted);
+
+    } catch (err) {
+      console.error("โหลดความหนาแน่นไม่สำเร็จ", err);
+    }
+  };
 
   const [search1, setSearch1] = useState("");
   const [search2, setSearch2] = useState("");
 
-  const [alert, setAlert] = useState<{ 
-    type: 'edit' | 'delete' | 'add' | 'success' | null, 
+  const [alert, setAlert] = useState<{
+    type: 'edit' | 'delete' | 'add' | 'success' | null,
     item: MetalCategory | null,
     group: 1 | 2
   }>({ type: null, item: null, group: 1 });
@@ -41,7 +73,7 @@ export default function MetalCategoryPage() {
   const filtered1 = metalGroup1.filter(m => m.name.toLowerCase().includes(search1.toLowerCase()));
   const filteredDensity = metalGroupDensity.filter(m => m.name.toLowerCase().includes(search2.toLowerCase()));
 
-  // Actions for Group 1
+  
   const handleEdit1 = (item: MetalCategory) => {
     setEditName(item.name);
     setAlert({ type: 'edit', item, group: 1 });
@@ -52,7 +84,7 @@ export default function MetalCategoryPage() {
     setAlert({ type: 'add', item: null, group: 1 });
   };
 
-  // Actions for Group 2
+  
   const handleEdit2 = (item: MetalCategory) => {
     setEditName(item.name);
     setAlert({ type: 'edit', item, group: 2 });
@@ -63,52 +95,132 @@ export default function MetalCategoryPage() {
     setAlert({ type: 'add', item: null, group: 2 });
   };
 
-  const handleToggleStatus = (item: MetalCategory, group: 1 | 2) => {
-    if (group === 1) {
-      setMetalGroup1(prev => prev.map(t => t.id === item.id ? { ...t, status: t.status === 1 ? 0 : 1 } : t));
-    } else {
-      setMetalGroupDensity(prev => prev.map(t => t.id === item.id ? { ...t, status: t.status === 1 ? 0 : 1 } : t));
+  const toggleDensityStatus = async (id: number, currentStatus: number) => {
+    const newStatus = currentStatus === 1 ? 0 : 1;
+
+    try {
+      await fetch(`${API}/bases/status/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: newStatus,
+        }),
+      });
+
+      setMetalGroupDensity(prev =>
+        prev.map(item =>
+          item.id === id ? { ...item, status: newStatus } : item
+        )
+      );
+
+    } catch (error) {
+      console.error(error);
     }
   };
+  const toggleColorStatus = async (id: number, currentStatus: number) => {
+    const newStatus = currentStatus === 1 ? 0 : 1;
 
-  const confirmDelete = () => {
-    if (alert.item) {
+    try {
+      await fetch(`${API}/base-colors/status/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: newStatus,
+        }),
+      });
+
+      fetchColors();
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const confirmDelete = async () => {
+    if (!alert.item || !alert.item.id) {
+      console.error("ID ของ item ยังไม่ถูกกำหนด!");
+      return;
+    }
+    try {
       if (alert.group === 1) {
-        setMetalGroup1(prev => prev.filter(t => t.id !== alert.item!.id));
+        await fetch(`${API}/base-colors/${alert.item.id}`, { method: "DELETE" });
+        fetchColors();
       } else {
-        setMetalGroupDensity(prev => prev.filter(t => t.id !== alert.item!.id));
+        await fetch(`${API}/bases/${alert.item.id}`, { method: "DELETE" });
+        fetchDensity();
       }
-      setAlert(prev => ({ ...prev, type: 'success' }));
+
+      setAlert(prev => ({ ...prev, type: "success" }));
       setTimeout(closeAlert, 1500);
+
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  const handleSaveEdit = () => {
-    if (alert.item && editName.trim()) {
+  const handleSaveEdit = async () => {
+    if (!alert.item || !alert.item.id) {
+      console.error("ID ของ item ยังไม่ถูกกำหนด!");
+      return;
+    }
+    if (!editName.trim()) return;
+
+    try {
       if (alert.group === 1) {
-        setMetalGroup1(prev => prev.map(t => t.id === alert.item!.id ? { ...t, name: editName } : t));
+        await fetch(`${API}/base-colors/${alert.item.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ color_name: editName })
+        });
+        fetchColors();
       } else {
-        setMetalGroupDensity(prev => prev.map(t => t.id === alert.item!.id ? { ...t, name: editName } : t));
+        await fetch(`${API}/bases/${alert.item.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ base_density: editName })
+        });
+        fetchDensity();
       }
-      setAlert(prev => ({ ...prev, type: 'success' }));
+
+      setAlert(prev => ({ ...prev, type: "success" }));
       setTimeout(closeAlert, 1500);
+
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  const confirmAdd = () => {
-    if (newName.trim()) {
+  const confirmAdd = async () => {
+    if (!newName.trim()) return;
+
+    try {
+
       if (alert.group === 1) {
-        const newId = metalGroup1.length > 0 ? Math.max(...metalGroup1.map(t => t.id)) + 1 : 1;
-        setMetalGroup1(prev => [...prev, { id: newId, name: newName.trim(), status: 1 }]);
+        await fetch(`${API}/base-colors`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ color_name: newName })
+        });
+        fetchColors();
       } else {
-        const newId = metalGroupDensity.length > 0 ? Math.max(...metalGroupDensity.map(t => t.id)) + 1 : 101;
-        setMetalGroupDensity(prev => [...prev, { id: newId, name: newName.trim(), status: 1 }]);
+        await fetch(`${API}/bases`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ base_density: newName })
+        });
+        fetchDensity();
       }
-      setAlert(prev => ({ ...prev, type: 'success' }));
+
+      setAlert(prev => ({ ...prev, type: "success" }));
       setTimeout(closeAlert, 1500);
+
+    } catch (error) {
+      console.error(error);
     }
   };
-
   const closeAlert = () => {
     setAlert({ type: null, item: null, group: 1 });
     setEditName("");
@@ -127,9 +239,9 @@ export default function MetalCategoryPage() {
           </tr>
         </thead>
         <tbody>
-          {items.map((item) => (
-            <tr key={item.id}>
-              <td className="text-gray-400">#{item.id}</td>
+          {items.map((item, index) => (
+            <tr key={item.id ?? `metal-${index}`}>
+              <td className="text-gray-400">#{item.id ?? "-"}</td>
               <td className="font-medium">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   {item.name}
@@ -139,14 +251,16 @@ export default function MetalCategoryPage() {
                 </div>
               </td>
               <td style={{ textAlign: 'center' }}>
-                <label className="metal-switch">
-                  <input 
-                    type="checkbox" 
-                    checked={item.status === 1}
-                    onChange={() => handleToggleStatus(item, group)}
-                  />
-                  <span className="metal-slider"></span>
-                </label>
+                <button
+                  onClick={() =>
+                    group === 2
+                      ? toggleDensityStatus(item.id, item.status)
+                      : toggleColorStatus(item.id, item.status)
+                  }
+                  className={`metal-status-toggle ${item.status === 1 ? "active" : "inactive"}`}
+                >
+                  <span className="metal-toggle-dot"></span>
+                </button>
               </td>
               <td style={{ textAlign: 'right' }}>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.25rem' }}>
@@ -156,11 +270,6 @@ export default function MetalCategoryPage() {
               </td>
             </tr>
           ))}
-          {items.length === 0 && (
-            <tr>
-              <td colSpan={4} style={{ textAlign: 'center', padding: '2rem', color: '#9CA3AF' }}>ไม่มีข้อมูล</td>
-            </tr>
-          )}
         </tbody>
       </table>
     </div>
@@ -172,14 +281,14 @@ export default function MetalCategoryPage() {
 
       <main className="metal-main-content">
         <div className="metal-content-wrapper">
-          
+
           <div className="metal-header-section">
             <h1 className="metal-header-title">จัดการหมวดหมู่โลหะ</h1>
             <p className="metal-header-subtitle">จัดการสีและคุณลักษณะของโลหะในระบบแยกตามกลุ่ม</p>
           </div>
 
           <div className="metal-cards-grid">
-            {/* Card 1 */}
+
             <div className="metal-card">
               <div className="metal-card-header">
                 <h2 className="metal-card-title">
@@ -195,9 +304,9 @@ export default function MetalCategoryPage() {
               <div className="metal-card-filter">
                 <div className="metal-search-box text-gray-400">
                   <Search size={16} />
-                  <input 
-                    type="text" 
-                    placeholder="ค้นหา..." 
+                  <input
+                    type="text"
+                    placeholder="ค้นหา..."
                     className="metal-search-input"
                     value={search1}
                     onChange={(e) => setSearch1(e.target.value)}
@@ -208,7 +317,7 @@ export default function MetalCategoryPage() {
               {renderTable(filtered1, handleEdit1, handleDelete1, 1)}
             </div>
 
-            {/* Card 2 */}
+
             <div className="metal-card">
               <div className="metal-card-header">
                 <h2 className="metal-card-title">
@@ -224,9 +333,9 @@ export default function MetalCategoryPage() {
               <div className="metal-card-filter">
                 <div className="metal-search-box text-gray-400">
                   <Search size={16} />
-                  <input 
-                    type="text" 
-                    placeholder="ค้นหา..." 
+                  <input
+                    type="text"
+                    placeholder="ค้นหา..."
                     className="metal-search-input"
                     value={search2}
                     onChange={(e) => setSearch2(e.target.value)}
@@ -241,7 +350,6 @@ export default function MetalCategoryPage() {
         </div>
       </main>
 
-      {/* Alert Modals */}
       {alert.type && (
         <div className="metal-modal-overlay" onClick={closeAlert}>
           <div className="metal-alert-card" onClick={e => e.stopPropagation()}>
@@ -261,14 +369,14 @@ export default function MetalCategoryPage() {
                 <h3 className="metal-alert-title">
                   {alert.type === 'add' ? `เพิ่ม${alert.group === 1 ? 'สีโลหะ' : 'ความหนาแน่น'}` : alert.type === 'edit' ? `แก้ไข${alert.group === 1 ? 'สีโลหะ' : 'ความหนาแน่น'}` : 'ยืนยันการลบ'}
                 </h3>
-                
+
                 <div className="metal-alert-text">
                   {alert.type === 'add' ? (
                     <div style={{ marginTop: '1rem', textAlign: 'left' }}>
                       <label className="text-xs font-bold text-gray-500 mb-1 block">ชื่อสีโลหะ</label>
-                      <input 
-                        type="text" 
-                        className="custom-input" 
+                      <input
+                        type="text"
+                        className="custom-input"
                         style={{ border: '1px solid #e5e7eb', padding: '0.75rem 1rem', borderRadius: '0.5rem', width: '100%', outline: 'none' }}
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}
@@ -279,9 +387,9 @@ export default function MetalCategoryPage() {
                   ) : alert.type === 'edit' ? (
                     <div style={{ marginTop: '1rem', textAlign: 'left' }}>
                       <label className="text-xs font-bold text-gray-500 mb-1 block">ชื่อใหม่</label>
-                      <input 
-                        type="text" 
-                        className="custom-input" 
+                      <input
+                        type="text"
+                        className="custom-input"
                         style={{ border: '1px solid #e5e7eb', padding: '0.75rem 1rem', borderRadius: '0.5rem', width: '100%', outline: 'none' }}
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
@@ -293,8 +401,8 @@ export default function MetalCategoryPage() {
                   )}
                 </div>
 
-                <button 
-                  className="metal-alert-btn primary" 
+                <button
+                  className="metal-alert-btn primary"
                   onClick={alert.type === 'add' ? confirmAdd : alert.type === 'edit' ? handleSaveEdit : confirmDelete}
                 >
                   {alert.type === 'add' ? 'ยืนยันการเพิ่ม' : alert.type === 'edit' ? 'บันทึกการแก้ไข' : 'ยืนยันการลบ'}

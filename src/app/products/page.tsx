@@ -5,10 +5,11 @@ import {
   Gem, Layers, Plus, Search, Filter, Edit3, Trash2, X, ChevronDown,
   Package, Database, Sparkle
 } from 'lucide-react';
-import {Sidebar} from "@/components/sidebar"
+import { Sidebar } from "@/components/sidebar"
 import '@/app/css/products.css';
 import { useSearchParams, useRouter } from 'next/navigation';
 
+const API = "http://localhost:8080";
 
 
 
@@ -36,8 +37,8 @@ export default function JewelryManagementPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Constants for Dynamic Fields
+
+
   const DIAMOND_SHAPES = ["กลม", "ทรงไข่", "ทรงหยดน้ำ", "เอเมอรัลด์คัท", "พรินเซสคัท", "มาร์คีส์", "เรเดียนท์คัท", "คุชชั่นคัท"];
   const CLARITY_OPTIONS = ["I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF", "FL"];
   const COLOR_OPTIONS = ["K(93)", "J(94)", "I(95)", "H(96)", "G(97)", "F(98)", "E(99)", "D(100)"];
@@ -46,10 +47,31 @@ export default function JewelryManagementPage() {
   const METAL_COLORS = ["ทองขาว", "ทองคำ", "ทองชมพู", "ทองวานิลลา"];
   const METAL_OPTIONS = ["18K", "10K", "9K"];
 
+  const [metalColors, setMetalColors] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('ประเภทเครื่องประดับทั้งหมด');
   const [statusFilter, setStatusFilter] = useState<'all' | 'open' | 'closed'>('all');
   const [shapeFilter, setShapeFilter] = useState('รูปทรงเพชรทั้งหมด');
+
+  useEffect(() => {
+    fetch(`${API}/metal_categories`)
+      .then(res => res.json())
+      .then(data => {
+        console.log("metal data:", data);
+        // ตรวจสอบโครงสร้าง Response จาก Backend
+        if (Array.isArray(data)) {
+          setMetalColors(data);
+        } else if (data && Array.isArray(data.data)) {
+          setMetalColors(data.data);
+        } else {
+          setMetalColors([]);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        setMetalColors([]);
+      });
+  }, []);
 
   interface ProductType {
     product_type_id: number;
@@ -58,24 +80,26 @@ export default function JewelryManagementPage() {
 
   const [categories, setCategories] = useState<ProductType[]>([]);
   useEffect(() => {
-    fetch("http://localhost:8080/product-types")
+    fetch(`${API}/product-types`)
       .then(res => res.json())
       .then(data => setCategories(data))
       .catch(err => console.error(err));
   }, []);
+
+
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
 
   const [newProduct, setNewProduct] = useState({
     product_name: '',
-    product_type: '', // เพชร, แหวนเพชร, ต่างหู, สร้อยคอพร้อมจี้, กำไลเพชร
+    product_type: '',
     price: '',
     description: '',
     status: 1,
-    // Dynamic Fields
+
     diamond_shape: '',
-    diamond_origin: '', // LAB, NATURAL
+    diamond_origin: '',
     clarity: '',
     color: '',
     carat: '',
@@ -83,6 +107,8 @@ export default function JewelryManagementPage() {
     earring_type: '',
     metal_color: '',
     metal_option: '',
+
+
     images: [] as string[]
   });
 
@@ -113,10 +139,10 @@ export default function JewelryManagementPage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('http://localhost:8080/api/admin/jewelry-management');
+      const res = await fetch(`${API}/products`)
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
-      setProducts(data?.products || []);
+      setProducts(data || []);
     } catch (err) {
       console.error("Fetch error:", err);
       setProducts([]);
@@ -134,7 +160,7 @@ export default function JewelryManagementPage() {
       const matchSearch = (p.product_name || '').toLowerCase().includes(searchTerm.toLowerCase());
       const matchCat = categoryFilter === 'ประเภทเครื่องประดับทั้งหมด' || p.category_name === categoryFilter;
       const matchStatus = statusFilter === 'all' ? true : statusFilter === 'open' ? p.status === 1 : p.status === 0;
-      
+
       let matchShape = true;
       if (shapeFilter !== 'รูปทรงเพชรทั้งหมด') {
         try {
@@ -152,7 +178,7 @@ export default function JewelryManagementPage() {
 
   const handleEdit = (product: any) => {
     setEditingProduct(product);
-    
+
     let specs = {
       diamond_shape: '',
       diamond_origin: '',
@@ -180,24 +206,49 @@ export default function JewelryManagementPage() {
       price: product.price.toString(),
       description: product.description || '',
       status: product.status,
-      ...specs,
-      images: [] // We'll handle images separately or just keep links
+
+      diamond_shape: specs.diamond_shape || '',
+      diamond_origin: specs.diamond_origin || '',
+      clarity: specs.clarity || '',
+      color: specs.color || '',
+      carat: specs.carat || '',
+      ring_style: specs.ring_style || '',
+      earring_type: specs.earring_type || '',
+      metal_color: specs.metal_color || '',
+      metal_option: specs.metal_option || '',
+
+      images: []
     });
 
-    // Populate previews if images exist
+
     if (product.image_url) {
-      const mainImg = product.image_url.startsWith('http') ? product.image_url : `http://localhost:8080/static/uploads/${product.image_url}`;
-      setImagePreviews([mainImg]);
+      const mainImg = product.image_url.startsWith('http')
+        ? product.image_url
+        : `${API}/static/uploads/${product.image_url}`;
     }
 
     setIsModalOpen(true);
   };
 
   const handleToggleStatus = async (id: number) => {
+    const product = products.find(p => p.product_id === id);
+
     try {
-      const res = await fetch(`http://localhost:8080/api/admin/jewelry/toggle-status/${id}`, {
-        method: 'PATCH',
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(`${API}/products/${id}/toggle-status`, {
+        method: 'PUT',
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          product_name: product.product_name,
+          price: product.price,
+          status: product.status === 1 ? 0 : 1
+        })
       });
+
       if (res.ok) {
         setProducts(prev =>
           prev.map(p =>
@@ -213,8 +264,13 @@ export default function JewelryManagementPage() {
   const handleDelete = async (id: number) => {
     if (!confirm('คุณต้องการลบสินค้านี้ใช่หรือไม่?')) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/admin/jewelry/${id}`, {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(`${API}/products/${id}`, {
         method: 'DELETE',
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
       });
       if (res.ok) {
         setProducts(prev => prev.filter(p => p.product_id !== id));
@@ -231,7 +287,7 @@ export default function JewelryManagementPage() {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       setImageFiles(prev => [...prev, ...files]);
-      
+
       const newPreviews = files.map(file => URL.createObjectURL(file));
       setImagePreviews(prev => [...prev, ...newPreviews]);
     }
@@ -249,14 +305,15 @@ export default function JewelryManagementPage() {
     }
 
     try {
-      // Simulation: Prepare image filenames
+
       const imageNames = imageFiles.map(file => file.name);
 
       const productToSave = {
-        ...newProduct,
+        product_name: newProduct.product_name,
         price: parseFloat(newProduct.price),
-        images: imageFiles.length > 0 ? imageNames : (editingProduct?.image_url ? [editingProduct.image_url] : []),
-        specs: {
+
+
+        product_detail: JSON.stringify({
           diamond_shape: newProduct.diamond_shape,
           diamond_origin: newProduct.diamond_origin,
           clarity: newProduct.clarity,
@@ -266,18 +323,31 @@ export default function JewelryManagementPage() {
           earring_type: newProduct.earring_type,
           metal_color: newProduct.metal_color,
           metal_option: newProduct.metal_option,
-        }
-      };
+        }),
 
-      const url = editingProduct 
-        ? `http://localhost:8080/api/admin/jewelry/${editingProduct.product_id}`
-        : 'http://localhost:8080/api/admin/jewelry';
-      
+
+        product_type_id: categories.find(c => c.product_type_name === newProduct.product_type)?.product_type_id || 1,
+
+        product_production_day: 1,
+        quantity: 1,
+
+
+        product_image: imageFiles.length > 0 ? imageFiles[0].name : ""
+      };
+      const url = editingProduct
+        ? `${API}/products/${editingProduct.product_id}`
+        : `${API}/products`;
+
       const method = editingProduct ? 'PUT' : 'POST';
+
+      const token = localStorage.getItem("token");
 
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(productToSave)
       });
 
@@ -317,18 +387,18 @@ export default function JewelryManagementPage() {
 
   const renderTypeSpecificFields = () => {
     const type = newProduct.product_type;
-    
+
     return (
       <div className="animate-fade-in space-y-4 mt-6 border-t pt-6">
-        {/* Diamond / Lab / Natural - Common for many types */}
+
         {(type === 'เพชร' || type === 'แหวนเพชร' || type === 'ต่างหู' || type === 'สร้อยคอพร้อมจี้' || type === 'กำไลเพชร') && (
           <div className="form-grid">
             <div className="form-group">
               <label className="form-label">ประเภทเพชร</label>
-              <select 
+              <select
                 className="custom-select"
                 value={newProduct.diamond_origin}
-                onChange={e => setNewProduct({...newProduct, diamond_origin: e.target.value})}
+                onChange={e => setNewProduct({ ...newProduct, diamond_origin: e.target.value })}
               >
                 <option value="">เลือกประเภท...</option>
                 <option value="เพชรธรรมชาติ">เพชรธรรมชาติ</option>
@@ -338,29 +408,28 @@ export default function JewelryManagementPage() {
             {(type === 'เพชร' || type === 'แหวนเพชร') && (
               <div className="form-group">
                 <label className="form-label">กะรัต</label>
-                <input 
-                  type="text" 
-                  className="custom-input" 
+                <input
+                  type="text"
+                  className="custom-input"
                   placeholder="เช่น 1.05"
                   value={newProduct.carat}
-                  onChange={e => setNewProduct({...newProduct, carat: e.target.value})}
+                  onChange={e => setNewProduct({ ...newProduct, carat: e.target.value })}
                 />
               </div>
             )}
           </div>
         )}
 
-        {/* Clarity & Color - Better UI with Buttons */}
         {(type === 'เพชร' || type === 'แหวนเพชร' || type === 'ต่างหู' || type === 'สร้อยคอพร้อมจี้' || type === 'กำไลเพชร') && (
           <div className="space-y-4">
             <div className="form-group">
               <label className="form-label">ความสะอาด (Clarity)</label>
               <div className="flex flex-wrap gap-2">
                 {CLARITY_OPTIONS.map(opt => (
-                  <button 
+                  <button
                     key={opt}
                     type="button"
-                    onClick={() => setNewProduct({...newProduct, clarity: opt})}
+                    onClick={() => setNewProduct({ ...newProduct, clarity: opt })}
                     className={`px-3 py-1.5 text-xs rounded-md border transition-all ${newProduct.clarity === opt ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white text-gray-600 border-gray-200'}`}
                   >
                     {opt}
@@ -372,10 +441,10 @@ export default function JewelryManagementPage() {
               <label className="form-label">สี/น้ำ (Color)</label>
               <div className="flex flex-wrap gap-2">
                 {COLOR_OPTIONS.map(opt => (
-                  <button 
+                  <button
                     key={opt}
                     type="button"
-                    onClick={() => setNewProduct({...newProduct, color: opt})}
+                    onClick={() => setNewProduct({ ...newProduct, color: opt })}
                     className={`px-3 py-1.5 text-xs rounded-md border transition-all ${newProduct.color === opt ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-gray-600 border-gray-200'}`}
                   >
                     {opt}
@@ -386,16 +455,16 @@ export default function JewelryManagementPage() {
           </div>
         )}
 
-        {/* Shape Selection */}
+
         {(type === 'แหวนเพชร' || type === 'ต่างหู' || type === 'เพชร' || type === 'สร้อยคอพร้อมจี้' || type === 'กำไลเพชร') && (
           <div className="form-group">
             <label className="form-label">รูปทรงเพชร</label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {DIAMOND_SHAPES.map(shape => (
-                <button 
+                <button
                   key={shape}
                   type="button"
-                  onClick={() => setNewProduct({...newProduct, diamond_shape: shape})}
+                  onClick={() => setNewProduct({ ...newProduct, diamond_shape: shape })}
                   className={`p-2 text-xs rounded-lg border transition-all ${newProduct.diamond_shape === shape ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-600 border-gray-200'}`}
                 >
                   {shape}
@@ -405,16 +474,16 @@ export default function JewelryManagementPage() {
           </div>
         )}
 
-        {/* Ring Style Specific */}
+
         {type === 'แหวนเพชร' && (
           <div className="form-group">
             <label className="form-label">สไตล์แหวน</label>
             <div className="grid grid-cols-2 gap-2">
               {RING_STYLES.map(style => (
-                <button 
+                <button
                   key={style}
                   type="button"
-                  onClick={() => setNewProduct({...newProduct, ring_style: style})}
+                  onClick={() => setNewProduct({ ...newProduct, ring_style: style })}
                   className={`p-2 text-xs rounded-lg border transition-all ${newProduct.ring_style === style ? 'bg-amber-500 text-white border-amber-500' : 'bg-gray-50 text-gray-600 border-gray-200'}`}
                 >
                   {style}
@@ -424,16 +493,16 @@ export default function JewelryManagementPage() {
           </div>
         )}
 
-        {/* Earring Type Specific */}
+
         {type === 'ต่างหู' && (
           <div className="form-group">
             <label className="form-label">ประเภทต่างหู</label>
             <div className="grid grid-cols-3 gap-2">
               {EARRING_TYPES.map(etype => (
-                <button 
+                <button
                   key={etype}
                   type="button"
-                  onClick={() => setNewProduct({...newProduct, earring_type: etype})}
+                  onClick={() => setNewProduct({ ...newProduct, earring_type: etype })}
                   className={`p-2 text-xs rounded-lg border transition-all ${newProduct.earring_type === etype ? 'bg-blue-500 text-white border-blue-500' : 'bg-gray-50 text-gray-600 border-gray-200'}`}
                 >
                   {etype}
@@ -443,26 +512,26 @@ export default function JewelryManagementPage() {
           </div>
         )}
 
-        {/* Metal Selection - For Jewelry */}
+
         {(type === 'แหวนเพชร' || type === 'ต่างหู' || type === 'สร้อยคอพร้อมจี้' || type === 'กำไลเพชร') && (
           <div className="form-grid">
             <div className="form-group">
               <label className="form-label">สีโลหะ</label>
-              <select 
+              <select
                 className="custom-select"
-                value={newProduct.metal_color}
-                onChange={e => setNewProduct({...newProduct, metal_color: e.target.value})}
+                value={newProduct.metal_option}
+                onChange={e => setNewProduct({ ...newProduct, metal_option: e.target.value })}
               >
                 <option value="">เลือกสีโลหะ...</option>
-                {METAL_COLORS.map(c => <option key={c} value={c}>{c}</option>)}
+                {METAL_COLORS.map(o => <option key={o} value={o}>{o}</option>)}
               </select>
             </div>
             <div className="form-group">
               <label className="form-label">ตัวเลือกโลหะ</label>
-              <select 
+              <select
                 className="custom-select"
                 value={newProduct.metal_option}
-                onChange={e => setNewProduct({...newProduct, metal_option: e.target.value})}
+                onChange={e => setNewProduct({ ...newProduct, metal_option: e.target.value })}
               >
                 <option value="">เลือกตัวเลือก...</option>
                 {METAL_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
@@ -569,7 +638,11 @@ export default function JewelryManagementPage() {
                           <div className="product-cell">
                             <div className="product-icon-box">
                               {p.image_url ? (
-                                <img src={p.image_url.startsWith('http') ? p.image_url : `http://localhost:8080/static/uploads/${p.image_url}`} alt={p.product_name} className="w-full h-full object-cover rounded-md" />
+                                <img src={p.image_url.startsWith('http')
+                                  ? p.image_url
+                                  : `${API.replace('/api', '')}/static/uploads/${p.image_url}`}
+
+                                  className="w-full h-full object-cover rounded-md" />
                               ) : <Gem size={20} className="text-gray-400" />}
                             </div>
                             <div>
@@ -582,7 +655,7 @@ export default function JewelryManagementPage() {
                                       try {
                                         const specs = typeof p.product_detail === 'string' ? JSON.parse(p.product_detail) : p.product_detail;
                                         return specs?.diamond_shape || '';
-                                      } catch(e) { return ''; }
+                                      } catch (e) { return ''; }
                                     })()}
                                   </span>
                                 )}
@@ -617,7 +690,7 @@ export default function JewelryManagementPage() {
         </div>
       </main>
 
-      {/* Add/Edit Product Modal */}
+
       {isModalOpen && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="modal-content max-w-2xl" onClick={e => e.stopPropagation()}>
@@ -629,23 +702,24 @@ export default function JewelryManagementPage() {
               <div className="form-grid">
                 <div className="form-group full-width">
                   <label className="form-label">ชื่อสินค้า</label>
-                  <input 
-                    type="text" 
-                    className="custom-input" 
+                  <input
+                    type="text"
+                    className="custom-input"
                     placeholder="เช่น แหวนเพชรเม็ดเดี่ยว 18K"
                     value={newProduct.product_name}
-                    onChange={e => setNewProduct({...newProduct, product_name: e.target.value})}
+                    onChange={e => setNewProduct({ ...newProduct, product_name: e.target.value })}
                   />
                 </div>
                 <div className="form-group">
                   <label className="form-label">ประเภทสินค้า</label>
-                  <select 
+                  <select
                     className="custom-select"
                     value={newProduct.product_type}
-                    onChange={e => setNewProduct({...newProduct, product_type: e.target.value})}
+                    onChange={e => setNewProduct({ ...newProduct, product_type: e.target.value })}
                   >
                     <option value="">เลือกประเภท...</option>
                     <option value="เพชร">เพชร</option>
+                    <option value="แหวน">แหวน</option>
                     <option value="แหวนเพชร">แหวนเพชร</option>
                     <option value="ต่างหู">ต่างหู</option>
                     <option value="สร้อยคอพร้อมจี้">สร้อยคอพร้อมจี้</option>
@@ -654,12 +728,12 @@ export default function JewelryManagementPage() {
                 </div>
                 <div className="form-group">
                   <label className="form-label">ราคา (บาท)</label>
-                  <input 
-                    type="number" 
-                    className="custom-input" 
+                  <input
+                    type="number"
+                    className="custom-input"
                     placeholder="0.00"
                     value={newProduct.price}
-                    onChange={e => setNewProduct({...newProduct, price: e.target.value})}
+                    onChange={e => setNewProduct({ ...newProduct, price: e.target.value })}
                   />
                 </div>
               </div>
@@ -668,11 +742,11 @@ export default function JewelryManagementPage() {
 
               <div className="form-group mt-6">
                 <label className="form-label">รายละเอียดเพิ่มเติม</label>
-                <textarea 
-                  className="custom-input min-h-[100px]" 
+                <textarea
+                  className="custom-input min-h-[100px]"
                   placeholder="ระบุรายละเอียดสินค้า..."
                   value={newProduct.description}
-                  onChange={e => setNewProduct({...newProduct, description: e.target.value})}
+                  onChange={e => setNewProduct({ ...newProduct, description: e.target.value })}
                 ></textarea>
               </div>
 
@@ -704,13 +778,12 @@ export default function JewelryManagementPage() {
         </div>
       )}
 
-      {/* Notifications / Popups */}
+
       {popup.type && (
         <div className="modal-overlay">
           <div className="modal-content max-w-sm p-6 text-center">
-            <div className={`w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center ${
-              popup.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-            }`}>
+            <div className={`w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center ${popup.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+              }`}>
               {popup.type === 'success' ? <Package size={24} /> : <X size={24} />}
             </div>
             <h3 className="text-lg font-bold mb-2">{popup.type === 'success' ? 'สำเร็จ!' : 'แจ้งเตือน'}</h3>

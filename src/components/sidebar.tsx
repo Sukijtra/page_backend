@@ -41,6 +41,7 @@ export const Sidebar = () => {
     { label: "จัดการหมวดหมู่เพชร", href: "/products/diamond" },
     { label: "จัดการหมวดหมู่เครื่องประดับ", href: "/products/jewelry" },
     { label: "จัดการหมวดหมู่โลหะ", href: "/products/metal" },
+    { label: "จัดการไซส์แหวน", href: "/products/ring" },
   ],  
     },
     { label: "คำสั่งซื้อ", icon: ShoppingCart, href: "/orders" },
